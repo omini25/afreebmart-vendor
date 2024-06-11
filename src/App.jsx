@@ -4,11 +4,11 @@ import store from './redux/store';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
     DashboardPage,
-    GroupsAccountPage,
+    AdsPage,
     LoginPage, MessagesPage, OrdersPage, PaymentsHistoryPage,
-    ProductPage, ProfilePage,
+    ProfilePage,
     ShopPage,
-    SignupPage, WishlistPage
+    SignupPage, ProductPage
 } from "./routes/Routes.js";
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -28,11 +28,11 @@ function App() {
                     {/*<Route path="/product/:productName" element={<ProductPage />} />*/}
                     {/*<Route path="/shop" element={<ShopPage />} />*/}
                     <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/account/groups" element={<GroupsAccountPage />} />
+                    <Route path="/account/groups" element={<AdsPage />} />
                     <Route path="messages" element={<MessagesPage />} />
                     <Route path="/orders" element={<OrdersPage />} />
                     <Route path="/payments" element={<PaymentsHistoryPage />} />
-                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/products" element={<ProductPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
 
                 </Routes>

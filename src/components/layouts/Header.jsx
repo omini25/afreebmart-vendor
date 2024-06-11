@@ -448,7 +448,7 @@ export const Header = () => {
                                         </a>
                                     </div>
 
-                                    {/* Wishlist */}
+                                    {/* Products */}
                                     <div className="relative ml-4 flow-root lg:ml-6">
                                         <a href="#" className="group -m-2 flex items-center p-2">
                                             <HeartIcon

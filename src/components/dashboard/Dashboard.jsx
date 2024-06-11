@@ -1,27 +1,83 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Menu, Transition } from '@headlessui/react'
+import {Fragment, useEffect, useState} from 'react'
+import { Dialog, Transition } from '@headlessui/react'
 import {
     ChartBarSquareIcon,
     Cog6ToothIcon,
     FolderIcon,
     GlobeAltIcon,
     ServerIcon,
-    SignalIcon, UserIcon,
+    SignalIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { Bars3Icon, ChevronRightIcon, ChevronUpDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { Bars3Icon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/react/24/outline'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/actions';
+import { CheckIcon, HandThumbUpIcon, UserIcon } from '@heroicons/react/20/solid'
+import {server} from "../../server.js";
+import axios from "axios";
+
+const timeline = [
+    {
+        id: 1,
+        content: 'Applied to',
+        target: 'Front End Developer',
+        href: '#',
+        date: 'Sep 20',
+        datetime: '2020-09-20',
+        icon: UserIcon,
+        iconBackground: 'bg-gray-400',
+    },
+    {
+        id: 2,
+        content: 'Advanced to phone screening by',
+        target: 'Bethany Blake',
+        href: '#',
+        date: 'Sep 22',
+        datetime: '2020-09-22',
+        icon: HandThumbUpIcon,
+        iconBackground: 'bg-blue-500',
+    },
+    {
+        id: 3,
+        content: 'Completed phone screening with',
+        target: 'Martha Gardner',
+        href: '#',
+        date: 'Sep 28',
+        datetime: '2020-09-28',
+        icon: CheckIcon,
+        iconBackground: 'bg-green-500',
+    },
+    {
+        id: 4,
+        content: 'Advanced to interview by',
+        target: 'Bethany Blake',
+        href: '#',
+        date: 'Sep 30',
+        datetime: '2020-09-30',
+        icon: HandThumbUpIcon,
+        iconBackground: 'bg-blue-500',
+    },
+    {
+        id: 5,
+        content: 'Completed interview with',
+        target: 'Katherine Snyder',
+        href: '#',
+        date: 'Oct 4',
+        datetime: '2020-10-04',
+        icon: CheckIcon,
+        iconBackground: 'bg-green-500',
+    },
+]
 
 
 
 const navigation = [
     { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: true },
     { name: 'Orders', href: '/orders', icon: ServerIcon, current: false },
-    { name: 'Wishlist', href: '/wishlist', icon: SignalIcon, current: false },
-    { name: 'Groups', href: '/account/groups', icon: GlobeAltIcon, current: false },
+    { name: 'Products', href: '/products', icon: SignalIcon, current: false },
+    { name: 'Ads', href: '/account/groups', icon: GlobeAltIcon, current: false },
     { name: 'Messages', href: '/messages', icon: ChartBarSquareIcon, current: false },
     { name: 'Payment History', href: '/payments', icon: Cog6ToothIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserIcon, current: false },
@@ -87,7 +143,48 @@ const people = [
 
 export const Dashboard = () => {
     const dispatch = useDispatch();
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [orders, setOrders] = useState([]);
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    console.log(user.user.id);
+
+
+    const [stats, setStats] = useState([]);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response1 = await axios.get(`${server}/vendor/${user.user.id}/order-count`);
+                const response2 = await axios.get('https://api.example.com/stats/2');
+                const response3 = await axios.get('https://api.example.com/stats/3');
+
+                setStats([
+                    { id: 1, ...response1.data },
+                    { id: 2, ...response2.data },
+                    { id: 3, ...response3.data },
+                ]);
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get(`${server}/vendor/orders/${user.user.id}`);
+                console.log(response);
+                setOrders(response.data);
+            } catch (error) {
+                console.error('Failed to fetch orders:', error);
+            }
+        };
+
+        fetchOrders();
+    }, []);
 
     return (
         <>
@@ -321,20 +418,20 @@ export const Dashboard = () => {
                                         Dashboard
                                     </h2>
                                 </div>
-                                {/*<div className="mt-4 flex md:ml-4 md:mt-0">*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
-                                {/*    >*/}
-                                {/*        Edit*/}
-                                {/*    </button>*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="ml-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"*/}
-                                {/*    >*/}
-                                {/*        Publish*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
+                                <div className="mt-4 flex md:ml-4 md:mt-0">
+                                    <button
+                                        type="button"
+                                        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                    >
+                                        Add a product
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    >
+                                        Request payment
+                                    </button>
+                                </div>
                             </div>
 
 
@@ -349,7 +446,7 @@ export const Dashboard = () => {
                                         className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
                                     >
                                         <dt>
-                                            <div className="absolute rounded-md bg-indigo-500 p-3">
+                                            <div className="absolute rounded-md bg-primary p-3">
                                                 <item.icon className="h-6 w-6 text-white" aria-hidden="true"/>
                                             </div>
                                             <p className="ml-16 truncate text-sm font-medium text-gray-500">{item.name}</p>
@@ -379,7 +476,7 @@ export const Dashboard = () => {
                                             <div className="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
                                                 <div className="text-sm">
                                                     <a href="#"
-                                                       className="font-medium text-indigo-600 hover:text-indigo-500">
+                                                       className="font-medium text-primary hover:text-secondary">
                                                         View all<span className="sr-only"> {item.name} stats</span>
                                                     </a>
                                                 </div>
@@ -402,20 +499,20 @@ export const Dashboard = () => {
                                             <div className="p-6">
                                                 <div>
                                                     <ul role="list" className="divide-y divide-gray-100">
-                                                        {people.map((person) => (
-                                                            <li key={person.email}
+                                                        {orders.map((order) => (
+                                                            <li key={order.id}
                                                                 className="flex items-center justify-between gap-x-6 py-5">
                                                                 <div className="flex gap-x-4">
                                                                     <img
                                                                         className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                                                                        src={person.imageUrl} alt=""/>
+                                                                        src={order.imageUrl} alt=""/>
                                                                     <div className="min-w-0 flex-auto">
-                                                                        <p className="text-sm font-semibold leading-6 text-gray-900">{person.name}</p>
-                                                                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">{person.email}</p>
+                                                                        <p className="text-sm font-semibold leading-6 text-gray-900">{order.name}</p>
+                                                                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">{order.email}</p>
                                                                     </div>
                                                                 </div>
                                                                 <a
-                                                                    href={person.href}
+                                                                    href={order.href}
                                                                     className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                                 >
                                                                     View
@@ -439,11 +536,57 @@ export const Dashboard = () => {
                                 {/* Right column */}
                                 <div className="grid grid-cols-1 gap-4">
                                     <section aria-labelledby="section-2-title">
-                                        <h2 className="sr-only" id="section-2-title">
-                                            Section title
+                                        <h2 className="text-primary" id="section-2-title">
+                                            Notifications
                                         </h2>
                                         <div className="overflow-hidden rounded-lg bg-white shadow">
-                                            <div className="p-6">{/* Your content */}</div>
+                                            <div className="p-6">
+                                                <div className="flow-root">
+                                                    <ul role="list" className="-mb-8">
+                                                        {timeline.map((event, eventIdx) => (
+                                                            <li key={event.id}>
+                                                                <div className="relative pb-8">
+                                                                    {eventIdx !== timeline.length - 1 ? (
+                                                                        <span
+                                                                            className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
+                                                                            aria-hidden="true"/>
+                                                                    ) : null}
+                                                                    <div className="relative flex space-x-3">
+                                                                        <div>
+                                                                          <span
+                                                                              className={classNames(
+                                                                                  event.iconBackground,
+                                                                                  'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white'
+                                                                              )}
+                                                                          >
+                                                                            <event.icon className="h-5 w-5 text-white" aria-hidden="true"/>
+                                                                          </span>
+                                                                        </div>
+                                                                        <div
+                                                                            className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                                                            <div>
+                                                                                <p className="text-sm text-gray-500">
+                                                                                    {event.content}{' '}
+                                                                                    <a href={event.href}
+                                                                                       className="font-medium text-gray-900">
+                                                                                        {event.target}
+                                                                                    </a>
+                                                                                </p>
+                                                                            </div>
+                                                                            <div
+                                                                                className="whitespace-nowrap text-right text-sm text-gray-500">
+                                                                                <time
+                                                                                    dateTime={event.datetime}>{event.date}</time>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+
+                                            </div>
                                         </div>
                                     </section>
                                 </div>

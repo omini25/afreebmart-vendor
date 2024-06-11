@@ -10,39 +10,43 @@ import {
     XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { Bars3Icon, ChevronRightIcon, ChevronUpDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
-import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/react/24/outline'
+import { CheckIcon } from '@heroicons/react/24/outline'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/actions';
-import {EyeIcon, HeartIcon, ShoppingCartIcon} from "@heroicons/react/24/outline/index.js";
-import {Link} from "react-router-dom";
 
 
 
 const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: true },
+    { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: false },
     { name: 'Orders', href: '/orders', icon: ServerIcon, current: false },
-    { name: 'Wishlist', href: '/wishlist', icon: SignalIcon, current: false },
-    { name: 'Groups', href: '/account/groups', icon: GlobeAltIcon, current: false },
+    { name: 'Products', href: '/products', icon: SignalIcon, current: true },
+    { name: 'Ads', href: '/account/groups', icon: GlobeAltIcon, current: false },
     { name: 'Messages', href: '/messages', icon: ChartBarSquareIcon, current: false },
     { name: 'Payment History', href: '/payments', icon: Cog6ToothIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserIcon, current: false },
 ]
 
+const people = [
+    {
+        name: 'Lindsay Walton',
+        title: 'Front-end Developer',
+        department: 'Optimization',
+        email: 'lindsay.walton@example.com',
+        role: 'Member',
+        image:
+            'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    },
+    // More people...
+]
 
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-const stats = [
-    { id: 1, name: 'Total Orders', stat: '71,897', icon: UsersIcon, change: '122', changeType: 'increase' },
-    { id: 2, name: 'Pending Orders', stat: '58.16%', icon: EnvelopeOpenIcon, change: '5.4%', changeType: 'increase' },
-    { id: 3, name: 'Wishlist', stat: '24.57%', icon: CursorArrowRaysIcon, change: '3.2%', changeType: 'decrease' },
-]
 
 
-export const Wishlist = () => {
+export const Products = () => {
     const dispatch = useDispatch();
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -270,87 +274,100 @@ export const Wishlist = () => {
                     </div>
 
                     <main className="lg:pr-10 lg:pl-10">
-                        <header
-                            className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                            <div className="md:flex md:items-center md:justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                        Dashboard
-                                    </h2>
-                                </div>
-                                {/*<div className="mt-4 flex md:ml-4 md:mt-0">*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
-                                {/*    >*/}
-                                {/*        Edit*/}
-                                {/*    </button>*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="ml-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"*/}
-                                {/*    >*/}
-                                {/*        Publish*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
-                            </div>
+                        <div className="bg-white">
 
 
-                        </header>
-
-                        <div>
-
-                            <div
-                                className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8 w-3/4">
-                                {products.map((product, index) => (
-                                    <div key={index}>
-                                        <div className="relative">
-                                            <div className="relative h-72 w-full overflow-hidden rounded-lg">
-                                                <div className="absolute z-10 top-2 left-2 flex flex-col space-y-2">
-                                                    <EyeIcon onClick={() => handleEyeClick(product)}
-                                                             className="h-8 w-8 text-primary cursor-pointer"
-                                                             aria-hidden="true"
-                                                    />
-                                                    <HeartIcon className="h-8 w-8 text-primary" aria-hidden="true"/>
-                                                </div>
-                                                <img
-                                                    src={`https://afreebmart.com/images/products/${product.image}`}
-                                                    alt={product.product_name}
-                                                    className="h-full w-full object-cover object-center"
-                                                />
-                                            </div>
-                                            <div className="relative mt-4">
-                                                <h3 className="text-sm font-medium text-gray-900">
-                                                    <Link to={`/product/${product.product_name}`}>
-                                                        {product.product_name}
-                                                    </Link>
-                                                </h3>
-                                                <p className="mt-1 text-sm text-gray-500">{product.category}</p>
-                                            </div>
-                                            <div
-                                                className="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">
-                                                <div
-                                                    aria-hidden="true"
-                                                    className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50"
-                                                />
-                                                <p className="relative text-lg font-semibold text-primary">${product.price}</p>
-                                            </div>
+                            <main className="pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
+                                <div className="px-4 sm:px-6 lg:px-8">
+                                    <div className="sm:flex sm:items-center">
+                                        <div className="sm:flex-auto">
+                                            <h1 className="text-base font-semibold leading-6 text-gray-900">Products</h1>
+                                            <p className="mt-2 text-sm text-gray-700">
+                                                A list of all the products you have added
+                                            </p>
                                         </div>
-                                        <div className="mt-6">
-                                            <a
-                                                href={product.href}
-                                                className="relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                                            <button
+                                                type="button"
+                                                className="block rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                             >
-                                                {product.group === 1 ? "Create or Join Group" : "Add to Cart"}
-                                                {product.group === 1 ?
-                                                    <PeopleIcon className="h-5 w-5 ml-2" aria-hidden="true"/> :
-                                                    <ShoppingCartIcon className="h-5 w-5 ml-2" aria-hidden="true"/>
-                                                }
-                                                <span className="sr-only">, {product.name}</span>
-                                            </a>
+                                                Add product
+                                            </button>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                    <div className="mt-8 flow-root">
+                                        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                                <table className="min-w-full divide-y divide-gray-300">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col"
+                                                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                                                            Product
+                                                        </th>
+                                                        <th scope="col"
+                                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                            Customer
+                                                        </th>
+                                                        <th scope="col"
+                                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                            Status
+                                                        </th>
+                                                        <th scope="col"
+                                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                            Date
+                                                        </th>
+                                                        <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                                                            <span className="sr-only">Action</span>
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                                    {people.map((person) => (
+                                                        <tr key={person.email}>
+                                                            <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
+                                                                <div className="flex items-center">
+                                                                    <div className="h-11 w-11 flex-shrink-0">
+                                                                        <img className="h-11 w-11 rounded-full"
+                                                                             src={person.image} alt=""/>
+                                                                    </div>
+                                                                    <div className="ml-4">
+                                                                        <div
+                                                                            className="font-medium text-gray-900">{person.name}</div>
+                                                                        <div
+                                                                            className="mt-1 text-gray-500">{person.email}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
+                                                                <div className="text-gray-900">{person.title}</div>
+                                                                <div
+                                                                    className="mt-1 text-gray-500">{person.department}</div>
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
+                                                              <span
+                                                                  className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                                Active
+                                                              </span>
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">{person.role}</td>
+                                                            <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                                                <a href="#"
+                                                                   className="text-indigo-600 hover:text-indigo-900">
+                                                                    View/Edit<span className="sr-only">, {person.name}</span>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </main>
+
+
                         </div>
                     </main>
 
@@ -360,4 +377,4 @@ export const Wishlist = () => {
     )
 }
 
-export default Wishlist
+export default Products

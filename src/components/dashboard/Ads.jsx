@@ -45,7 +45,7 @@ const people = [
     // More people...
 ]
 
-export const AccountGroups = () => {
+export const Ads = () => {
     const dispatch = useDispatch();
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -356,4 +356,4 @@ export const AccountGroups = () => {
     )
 }
 
-export default AccountGroups
+export default Ads

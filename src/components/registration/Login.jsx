@@ -1,15 +1,20 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/actions/actions';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useState } from 'react';
+import { login } from '../../redux/actions/actions.js';
+// import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
+import {useLocation} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify";
+import {useState} from "react";
 
 export const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+    const [visible, setVisible] = useState(false);
+    const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.user);
+    // const { error } = useSelector((state) => state.user);
 
     const handleSubmit = async (event) => {
         event.preventDefault();

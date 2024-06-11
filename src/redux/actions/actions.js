@@ -7,27 +7,14 @@ import {
     LOGIN_FAILURE
 } from '../types.js';
 import {toast} from "react-toastify";
-import {server} from "../../server.js";
+import axios from "axios";
 
-export const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
-
-export const removeFromCart = (product) => ({
-    type: REMOVE_FROM_CART,
-    payload: product,
-});
-
-export const UPDATE_QUANTITY = 'UPDATE_QUANTITY';
-
-export const updateQuantity = (product, quantity) => ({
-    type: UPDATE_QUANTITY,
-    payload: { product, quantity },
-});
 
 export const signup = (name, email, password) => {
     return async (dispatch) => {
         dispatch({ type: SIGNUP_REQUEST });
         try {
-            const response = await fetch(`${server}/vendor-register`, {
+            const response = await fetch('https://afreebmart.com/api/vendor-register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,8 +31,9 @@ export const signup = (name, email, password) => {
             // Save user's details in Redux store
             dispatch({ type: SIGNUP_SUCCESS, payload: data });
 
-            // Save user's details in localStorage
+            // Save user's details and isLoggedIn state in localStorage
             localStorage.setItem('user', JSON.stringify(data));
+            localStorage.setItem('isLoggedIn', true);
 
             // Display the toast message here, after the signup request is successful
             toast.success('Signup successful!');
@@ -61,38 +49,43 @@ export const login = (email, password) => {
     return async (dispatch) => {
         dispatch({ type: LOGIN_REQUEST });
         try {
-            const response = await fetch(`${server}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const response = await axios.post('https://afreebmart.com/api/login', { email, password });
 
-            if (!response.status >= 200 && response.status < 300) {
+            if (response.status < 200 || response.status >= 300) {
                 throw new Error('Login failed. Please try again.');
             }
 
-            const data = await response.json();
+            const data = response.data;
+
+            // Check if the user's role is 'vendor'
+            if (data.user.role !== 'vendor') {
+                throw new Error('Access denied. You must be a vendor to log in.');
+            }
 
             // Save user's details in Redux store
             dispatch({ type: LOGIN_SUCCESS, payload: data });
 
-            // Save user's details in localStorage
+            // Save user's details and isLoggedIn state in localStorage
             localStorage.setItem('user', JSON.stringify(data));
+            localStorage.setItem('isLoggedIn', true);
 
             // Display the toast message here, after the login request is successful
             toast.success('Login successful!');
         } catch (error) {
             dispatch({ type: LOGIN_FAILURE, payload: error.message });
             // Display the toast message here, if the login request fails
-            toast.error('Login failed. Please try again.');
+            toast.error(error.message);
+            return error;
         }
     };
 };
 
 export const LOGOUT = 'LOGOUT';
 
-export const logout = () => ({
-    type: LOGOUT,
-});
+export const logout = () => {
+    // Clear user's details and isLoggedIn state from localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('isLoggedIn');
+
+    return { type: LOGOUT };
+};
