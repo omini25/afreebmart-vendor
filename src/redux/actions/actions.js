@@ -8,13 +8,14 @@ import {
 } from '../types.js';
 import {toast} from "react-toastify";
 import axios from "axios";
+import {server} from "../../server.js";
 
 
 export const signup = (name, email, password) => {
     return async (dispatch) => {
         dispatch({ type: SIGNUP_REQUEST });
         try {
-            const response = await fetch('https://afreebmart.com/api/vendor-register', {
+            const response = await fetch(`${server}/vendor-register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ export const login = (email, password) => {
     return async (dispatch) => {
         dispatch({ type: LOGIN_REQUEST });
         try {
-            const response = await axios.post('https://afreebmart.com/api/login', { email, password });
+            const response = await axios.post(`${server}/login`, { email, password });
 
             if (response.status < 200 || response.status >= 300) {
                 throw new Error('Login failed. Please try again.');
