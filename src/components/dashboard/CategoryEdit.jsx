@@ -1,5 +1,5 @@
 import {Fragment, useEffect, useState} from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Dialog, Menu, Transition } from '@headlessui/react'
 import {
     FolderIcon,
     GlobeAltIcon,
@@ -9,37 +9,37 @@ import {
     InboxStackIcon,
     MagnifyingGlassIcon, TagIcon, UserCircleIcon,
     UserGroupIcon,
-    ShoppingBagIcon, ShoppingCartIcon, TruckIcon, WalletIcon, ArrowRightStartOnRectangleIcon, ListBulletIcon,
+    ShoppingBagIcon, ShoppingCartIcon, TruckIcon, WalletIcon, ListBulletIcon, PhotoIcon,
 } from '@heroicons/react/20/solid'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/actions';
-import { CheckIcon, HandThumbUpIcon, UserIcon } from '@heroicons/react/20/solid'
+import axios from 'axios';
 import {server} from "../../server.js";
-import axios from "axios";
 import {assetServer} from "../../../assetServer.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
+import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
+import AddCategory from "./AddCategory.jsx";
+import {Link, useParams} from "react-router-dom";
 
 
 
 
 const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: true },
+    { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: false },
     { name: 'Orders', href: '/orders', icon: ShoppingCartIcon, current: false },
     { name: 'Products', href: '/products', icon: ShoppingBagIcon, current: false },
-    // { name: 'Categories', href: '/categories', icon: ListBulletIcon, current: false },
+    { name: 'Categories', href: '/categories', icon: ListBulletIcon, current: true },
     { name: 'Ads', href: '/ads', icon: GlobeAltIcon, current: false },
     { name: 'Deliveries', href: '/deliveries', icon: TruckIcon, current: false },
     { name: 'Payment History', href: '/payments', icon: banknotesIcon, current: false },
     { name: 'Payment Request', href: '/payments-requests', icon: WalletIcon, current: false },
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
-    // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
-    // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
+    { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
+    { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
-
-
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -47,80 +47,30 @@ function classNames(...classes) {
 
 
 
-
-
-
-export const Dashboard = () => {
+export const CategoryEdit = () => {
     const dispatch = useDispatch();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [orders, setOrders] = useState([]);
     const user = JSON.parse(localStorage.getItem('user'));
-    const [userCount, setUserCount] = useState(0);
-    const pendingOrdersCount = orders.filter(order => order.status === 'pending').length;
-    const [totalRevenue, setTotalRevenue] = useState(0);
-
-
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const { id } = useParams();
 
     useEffect(() => {
-        const totalRevenue = async () => {
+        const fetchCategories = async () => {
             try {
-                const response = await axios.get(`${server}/vendor/orders/${user.user.id}`);
-                // Flatten the array structure
-                const totalRevenue = response.data.total_price;
-                setTotalRevenue(totalRevenue);
+                const response = await axios.get(`${server}/admin/categories/${id}`);
+
+                setCategories(response.data[0]);
             } catch (error) {
-                console.error('Failed to fetch orders:', error);
+                console.error('Failed to fetch categories:', error);
             }
         };
 
-        totalRevenue();
+        fetchCategories();
     }, []);
 
+    console.log('categories:', categories);
 
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
-                setUserCount(response.data.flat().length);
-            } catch (error) {
-                console.error('Failed to fetch users:', error);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await axios.get(`${server}/vendor/orders/${user.user.id}`);
-                // Flatten the array structure
-                const flattenedOrders = response.data.orders;
-                setOrders(flattenedOrders);
-            } catch (error) {
-                console.error('Failed to fetch orders:', error);
-            }
-        };
-
-        fetchOrders();
-    }, []);
-
-    const [products, setProducts] = useState([]);
-
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
-                setProducts(response.data.flat());
-            } catch (error) {
-                console.error('Failed to fetch products:', error);
-            }
-        };
-
-        fetchProducts();
-    }, []);
 
     return (
         <>
@@ -222,7 +172,7 @@ export const Dashboard = () => {
                                                 <li className="-mx-6 mt-auto">
                                                     <a
                                                         href="/profile"
-                                                        className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-secondary hover:bg-secondary"
+                                                        className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-secondary hover:secondary"
                                                     >
                                                         <img
                                                             className="h-8 w-8 rounded-full bg-gray-800"
@@ -230,7 +180,6 @@ export const Dashboard = () => {
                                                             alt=""
                                                         />
                                                         <span className="sr-only">Your profile</span>
-                                                        <span aria-hidden="true">${user.vendor_info.wallet_balance}</span>
                                                         <span aria-hidden="true">{user.user.name}</span>
                                                     </a>
                                                 </li>
@@ -249,7 +198,7 @@ export const Dashboard = () => {
                     <div
                         className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 ring-1 ring-white/5 border border-primary">
                         <div className="flex h-16 shrink-0 items-center">
-                            <a href="/dashboard">
+                            <a href="/">
                                 <img
                                     className="h-8 w-auto"
                                     src="src/assets/afreemart-logo.png"
@@ -308,7 +257,6 @@ export const Dashboard = () => {
                                             alt=""
                                         />
                                         <span className="sr-only">Your profile</span>
-                                        <span aria-hidden="true">${user.vendor_info.wallet_balance}</span>
                                         <span aria-hidden="true">{user.user.name}</span>
                                     </a>
                                 </li>
@@ -321,10 +269,10 @@ export const Dashboard = () => {
                     {/* Sticky search header */}
                     <div
                         className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
-                        <button type="button" className="-m-2.5 p-2.5 text-white xl:hidden"
+                        <button type="button" className="-m-2.5 p-2.5 text-black xl:hidden"
                                 onClick={() => setSidebarOpen(true)}>
                             <span className="sr-only">Open sidebar</span>
-                            <Bars3Icon className="h-5 w-5 text-primary" aria-hidden="true"/>
+                            <Bars3Icon className="h-5 w-5" aria-hidden="true"/>
                         </button>
 
                         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -350,157 +298,111 @@ export const Dashboard = () => {
                     </div>
 
                     <main className="lg:pr-10 lg:pl-10">
-                        <header
-                            className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                            <div className="md:flex md:items-center md:justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                        Dashboard
-                                    </h2>
-                                </div>
-                                {/*<div className="mt-4 flex md:ml-4 md:mt-0">*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
-                                {/*    >*/}
-                                {/*        Add a product*/}
-                                {/*    </button>*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"*/}
-                                {/*    >*/}
-                                {/*        Request payment*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
-                            </div>
-                        </header>
-
-                        <div>
-
-                            <dl className="mx-auto grid grid-cols-1 gap-px bg-gray-900/5 sm:grid-cols-2 lg:grid-cols-4">
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">Total Revenue</dt>
-                                    {/*<dd className="text-xs font-medium text-gray-700">+4.75%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        ${totalRevenue}
-                                    </dd>
-                                </div>
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">
-                                        Orders
-                                    </dt>
-                                    {/*<dd className="text-xs font-medium text-rose-600">+54.02%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        {orders.length}
-                                    </dd>
-                                </div>
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">
-                                        Pending Orders
-                                    </dt>
-                                    {/*<dd className="text-xs font-medium text-gray-700">-1.39%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        {pendingOrdersCount}
-                                    </dd>
-                                </div>
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">All Products</dt>
-                                    {/*<dd className="text-xs font-medium text-rose-600">+10.18%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        {userCount}
-                                    </dd>
-                                </div>
-                            </dl>
+                        <div className="bg-white">
 
 
-                            {/* Main 3 column grid */}
-                            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 mt-10">
-                                {/* Left column */}
-                                <div className="grid grid-cols-1 gap-4 lg:col-span-2">
-                                    <section aria-labelledby="section-1-title">
-                                        <h2 className="text-primary" id="section-1-title">
-                                            Recent Orders
-                                        </h2>
-                                        <div className="overflow-hidden rounded-lg bg-white shadow">
-                                            <div className="p-6">
-                                                <div>
-                                                    <ul role="list" className="divide-y divide-gray-100">
-                                                        {orders.slice(0, 4).map((order) => (
-                                                            <li key={order.id}
-                                                                className="flex items-center justify-between gap-x-6 py-5">
-                                                                <div className="flex gap-x-4">
-                                                                    <img
-                                                                        className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                                                                        src={`${assetServer}/images/products/${order.image}`}
-                                                                        alt=""/>
-                                                                    <div className="min-w-0 flex-auto">
-                                                                        <p className="text-sm font-semibold leading-6 text-gray-900">{order.product_name}</p>
-                                                                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
-                                                                    </div>
+                            <main className="pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
+                                <div className="px-4 sm:px-6 lg:px-8">
+                                    <header
+                                        className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+                                        <div className="md:flex md:items-center md:justify-between">
+                                            <div className="min-w-0">
+                                                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                                                    Categories {id}
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <form>
+                                        <div className="space-y-12">
+                                            <div className="border-b border-gray-900/10 pb-12">
+                                                <h2 className="text-base font-semibold leading-7 text-gray-900">Category Information</h2>
+
+                                                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                                    <div className="sm:col-span-4">
+                                                        <label htmlFor="username"
+                                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                                            Category Name
+                                                        </label>
+                                                        <div className="mt-2">
+                                                            <div
+                                                                className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary sm:max-w-md">
+                                                                <input
+                                                                    type="text"
+                                                                    name="username"
+                                                                    id="username"
+                                                                    autoComplete="username"
+                                                                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                                    placeholder={`${categories.category_name}`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-span-full">
+                                                        <label htmlFor="about"
+                                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                                            Sub Category
+                                                        </label>
+                                                        <div className="mt-2">
+                                                            <textarea
+                                                                id="about"
+                                                                name="about"
+                                                                rows={3}
+                                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                                                defaultValue={''}
+                                                                placeholder={`${categories.sub_categories}`}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-span-full">
+                                                        <label htmlFor="cover-photo"
+                                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                                            Image
+                                                        </label>
+                                                        <div
+                                                            className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                                                            <div className="text-center">
+                                                                <PhotoIcon className="mx-auto h-12 w-12 text-gray-300"
+                                                                           aria-hidden="true"/>
+                                                                <div
+                                                                    className="mt-4 flex text-sm leading-6 text-gray-600">
+                                                                    <label
+                                                                        htmlFor="file-upload"
+                                                                        className="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-indigo-500"
+                                                                    >
+                                                                        <span>Upload a file</span>
+                                                                        <input id="file-upload" name="file-upload"
+                                                                               type="file" className="sr-only"/>
+                                                                    </label>
+                                                                    <p className="pl-1">or drag and drop</p>
                                                                 </div>
-                                                                <a
-                                                                    href={order.href}
-                                                                    className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                                                >
-                                                                    View
-                                                                </a>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                    <a
-                                                        href="#"
-                                                        className="flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                                                    >
-                                                        View all
-                                                    </a>
+                                                                <p className="text-xs leading-5 text-gray-600">PNG, JPG,
+                                                                    GIF up to 10MB</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-
                                             </div>
+                                            
                                         </div>
-                                    </section>
-                                </div>
 
-                                {/* Right column */}
-                                <div className="grid grid-cols-1 gap-4">
-                                    <section aria-labelledby="section-2-title">
-                                        <h2 className="text-primary" id="section-2-title">
-                                            Recent Products
-                                        </h2>
-                                        <div className="overflow-hidden rounded-lg bg-white shadow">
-                                            <div className="p-6">
-                                                <div className="flow-root">
-                                                    <ul role="list" className="-mb-8">
-                                                        {products.slice(0, 4).map((product) => (
-                                                            <tr key={product.id}>
-                                                                <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
-                                                                    <div className="flex items-center">
-                                                                        <div className="h-11 w-11 flex-shrink-0">
-                                                                            <img className="h-11 w-11 rounded-full"
-                                                                                 src={`${assetServer}/images/products/${product.image}`}
-                                                                                 alt=""/>
-                                                                        </div>
-                                                                        <div className="ml-4">
-                                                                            <div
-                                                                                className="font-medium text-gray-900">{product.product_name}</div>
-                                                                            <div
-                                                                                className="mt-1 text-gray-500">$ {product.price}</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-
-                                            </div>
+                                        <div className="mt-6 flex items-center justify-end gap-x-6">
+                                            <button type="button"
+                                                    className="text-sm font-semibold leading-6 text-gray-900">
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                                            >
+                                                Save
+                                            </button>
                                         </div>
-                                    </section>
+                                    </form>
                                 </div>
-                            </div>
+                            </main>
                         </div>
                     </main>
 
@@ -510,4 +412,4 @@ export const Dashboard = () => {
     )
 }
 
-export default Dashboard
+export default CategoryEdit

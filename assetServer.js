@@ -1,0 +1,1 @@
+export const assetServer = "https://afreebmart.com";

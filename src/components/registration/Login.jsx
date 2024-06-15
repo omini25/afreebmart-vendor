@@ -20,10 +20,11 @@ export const Login = () => {
         event.preventDefault();
         try {
             const userData = await dispatch(login(email, password));
-            // toast.success('Login successful!');
+            toast.success('Login successful!');
             navigate('/dashboard');
         } catch (error) {
             toast.error('Login failed!');
+            navigate('/');
         }
     };
 
@@ -37,7 +38,7 @@ export const Login = () => {
                         alt="Your Company"
                     />
                     <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                        Sign in to your account
+                        Login into your Vendor dashboard
                     </h2>
                 </div>
 
@@ -119,7 +120,7 @@ export const Login = () => {
 
                             <p className="mt-10 text-center text-sm text-gray-500">
                                 Not a vendor?{' '}
-                                <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                                <a href="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                                     Sign Up
                                 </a>
                             </p>

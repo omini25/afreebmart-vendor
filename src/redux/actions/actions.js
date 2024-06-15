@@ -11,7 +11,7 @@ import axios from "axios";
 import {server} from "../../server.js";
 
 
-export const signup = (name, email, password) => {
+export const signup = (name, store_name, store_description, email, password) => {
     return async (dispatch) => {
         dispatch({ type: SIGNUP_REQUEST });
         try {
@@ -20,7 +20,7 @@ export const signup = (name, email, password) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ name, store_name, store_description, email, password }),
             });
 
             if (!response.status >= 200 && response.status < 300) {
@@ -50,7 +50,7 @@ export const login = (email, password) => {
     return async (dispatch) => {
         dispatch({ type: LOGIN_REQUEST });
         try {
-            const response = await axios.post(`${server}/login`, { email, password });
+            const response = await axios.post(`${server}/vendor/login`, { email, password });
 
             if (response.status < 200 || response.status >= 300) {
                 throw new Error('Login failed. Please try again.');
@@ -60,7 +60,7 @@ export const login = (email, password) => {
 
             // Check if the user's role is 'vendor'
             if (data.user.role !== 'vendor') {
-                throw new Error('Access denied. You must be a vendor to log in.');
+                throw new Error('Access denied. You must be an Vendor to log in.');
             }
 
             // Save user's details in Redux store

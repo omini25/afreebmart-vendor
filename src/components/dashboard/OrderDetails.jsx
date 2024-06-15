@@ -1,5 +1,8 @@
-import {Fragment, useEffect, useState} from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
+import {
+    Cog6ToothIcon,
+} from '@heroicons/react/24/outline'
 import {
     FolderIcon,
     GlobeAltIcon,
@@ -9,22 +12,22 @@ import {
     InboxStackIcon,
     MagnifyingGlassIcon, TagIcon, UserCircleIcon,
     UserGroupIcon,
-    ShoppingBagIcon, ShoppingCartIcon, TruckIcon, WalletIcon, ArrowRightStartOnRectangleIcon, ListBulletIcon,
+    ShoppingBagIcon, ShoppingCartIcon, TruckIcon, WalletIcon, ListBulletIcon,
 } from '@heroicons/react/20/solid'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/actions';
-import { CheckIcon, HandThumbUpIcon, UserIcon } from '@heroicons/react/20/solid'
-import {server} from "../../server.js";
 import axios from "axios";
+import {server} from "../../server.js";
 import {assetServer} from "../../../assetServer.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
-
+import {Link, useParams} from "react-router-dom";
+import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
 
 
 
 const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: true },
-    { name: 'Orders', href: '/orders', icon: ShoppingCartIcon, current: false },
+    { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: false },
+    { name: 'Orders', href: '/orders', icon: ShoppingCartIcon, current: true },
     { name: 'Products', href: '/products', icon: ShoppingBagIcon, current: false },
     // { name: 'Categories', href: '/categories', icon: ListBulletIcon, current: false },
     { name: 'Ads', href: '/ads', icon: GlobeAltIcon, current: false },
@@ -46,81 +49,37 @@ function classNames(...classes) {
 }
 
 
-
-
-
-
-export const Dashboard = () => {
+export const OrderDetails = () => {
     const dispatch = useDispatch();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [orders, setOrders] = useState([]);
+    const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
-    const [userCount, setUserCount] = useState(0);
-    const pendingOrdersCount = orders.filter(order => order.status === 'pending').length;
-    const [totalRevenue, setTotalRevenue] = useState(0);
 
-
+    const { id } = useParams();
+    const [order, setOrder] = useState(null);
 
     useEffect(() => {
-        const totalRevenue = async () => {
+        const fetchOrder = async () => {
             try {
-                const response = await axios.get(`${server}/vendor/orders/${user.user.id}`);
+                const response = await axios.get(`${server}/admin/orders/${id}`);
                 // Flatten the array structure
-                const totalRevenue = response.data.total_price;
-                setTotalRevenue(totalRevenue);
+                const flattenedOrders = response.data.flat()[0];
+                setOrder(flattenedOrders);
             } catch (error) {
                 console.error('Failed to fetch orders:', error);
             }
         };
 
-        totalRevenue();
+        fetchOrder();
     }, []);
 
+    const statusToStep = {
+        'pending': 1,
+        'processing': 2,
+        'shipped': 3,
+        'completed': 4,
+    };
 
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
-                setUserCount(response.data.flat().length);
-            } catch (error) {
-                console.error('Failed to fetch users:', error);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await axios.get(`${server}/vendor/orders/${user.user.id}`);
-                // Flatten the array structure
-                const flattenedOrders = response.data.orders;
-                setOrders(flattenedOrders);
-            } catch (error) {
-                console.error('Failed to fetch orders:', error);
-            }
-        };
-
-        fetchOrders();
-    }, []);
-
-    const [products, setProducts] = useState([]);
-
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
-                setProducts(response.data.flat());
-            } catch (error) {
-                console.error('Failed to fetch products:', error);
-            }
-        };
-
-        fetchProducts();
-    }, []);
+    const step = order ? statusToStep[order.status] || 0 : 0;
 
     return (
         <>
@@ -222,7 +181,7 @@ export const Dashboard = () => {
                                                 <li className="-mx-6 mt-auto">
                                                     <a
                                                         href="/profile"
-                                                        className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-secondary hover:bg-secondary"
+                                                        className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-secondary hover:secondary"
                                                     >
                                                         <img
                                                             className="h-8 w-8 rounded-full bg-gray-800"
@@ -249,7 +208,7 @@ export const Dashboard = () => {
                     <div
                         className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 ring-1 ring-white/5 border border-primary">
                         <div className="flex h-16 shrink-0 items-center">
-                            <a href="/dashboard">
+                            <a href="/">
                                 <img
                                     className="h-8 w-auto"
                                     src="src/assets/afreemart-logo.png"
@@ -324,7 +283,7 @@ export const Dashboard = () => {
                         <button type="button" className="-m-2.5 p-2.5 text-white xl:hidden"
                                 onClick={() => setSidebarOpen(true)}>
                             <span className="sr-only">Open sidebar</span>
-                            <Bars3Icon className="h-5 w-5 text-primary" aria-hidden="true"/>
+                            <Bars3Icon className="h-5 w-5" aria-hidden="true"/>
                         </button>
 
                         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -350,157 +309,197 @@ export const Dashboard = () => {
                     </div>
 
                     <main className="lg:pr-10 lg:pl-10">
-                        <header
-                            className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                            <div className="md:flex md:items-center md:justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                        Dashboard
-                                    </h2>
-                                </div>
-                                {/*<div className="mt-4 flex md:ml-4 md:mt-0">*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
-                                {/*    >*/}
-                                {/*        Add a product*/}
-                                {/*    </button>*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"*/}
-                                {/*    >*/}
-                                {/*        Request payment*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
-                            </div>
-                        </header>
-
-                        <div>
-
-                            <dl className="mx-auto grid grid-cols-1 gap-px bg-gray-900/5 sm:grid-cols-2 lg:grid-cols-4">
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">Total Revenue</dt>
-                                    {/*<dd className="text-xs font-medium text-gray-700">+4.75%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        ${totalRevenue}
-                                    </dd>
-                                </div>
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">
-                                        Orders
-                                    </dt>
-                                    {/*<dd className="text-xs font-medium text-rose-600">+54.02%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        {orders.length}
-                                    </dd>
-                                </div>
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">
-                                        Pending Orders
-                                    </dt>
-                                    {/*<dd className="text-xs font-medium text-gray-700">-1.39%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        {pendingOrdersCount}
-                                    </dd>
-                                </div>
-                                <div
-                                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-                                    <dt className="text-sm font-medium leading-6 text-gray-500">All Products</dt>
-                                    {/*<dd className="text-xs font-medium text-rose-600">+10.18%</dd>*/}
-                                    <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                                        {userCount}
-                                    </dd>
-                                </div>
-                            </dl>
+                        <div className="bg-white">
 
 
-                            {/* Main 3 column grid */}
-                            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 mt-10">
-                                {/* Left column */}
-                                <div className="grid grid-cols-1 gap-4 lg:col-span-2">
-                                    <section aria-labelledby="section-1-title">
-                                        <h2 className="text-primary" id="section-1-title">
-                                            Recent Orders
-                                        </h2>
-                                        <div className="overflow-hidden rounded-lg bg-white shadow">
-                                            <div className="p-6">
-                                                <div>
-                                                    <ul role="list" className="divide-y divide-gray-100">
-                                                        {orders.slice(0, 4).map((order) => (
-                                                            <li key={order.id}
-                                                                className="flex items-center justify-between gap-x-6 py-5">
-                                                                <div className="flex gap-x-4">
+                            <div className="pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
+                                <div className="bg-gray-50">
+                                    <div className="mx-auto max-w-2xl pt-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+                                        <div
+                                            className="space-y-2 px-4 sm:flex sm:items-baseline sm:justify-between sm:space-y-0 sm:px-0">
+                                            <div className="flex sm:items-baseline sm:space-x-4">
+                                                <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Order
+                                                    #{id}</h1>
+
+                                            </div>
+                                            <p className="text-sm text-gray-600">
+                                                Order placed{' '}
+                                                <time dateTime="2021-03-22" className="font-medium text-gray-900">
+                                                    {order && new Date(order.created_at).toLocaleDateString()}
+                                                </time>
+                                            </p>
+                                        </div>
+
+                                        {/* Products */}
+                                        <div className="mt-6">
+                                            <h2 className="sr-only">Products purchased</h2>
+                                            <div className="space-y-8">
+                                                {order && (
+                                                    <div
+                                                        className="border-b border-t border-gray-200 bg-white shadow-sm sm:rounded-lg sm:border"
+                                                    >
+                                                        <div
+                                                            className="px-4 py-6 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:p-8">
+                                                            <div className="sm:flex lg:col-span-7">
+                                                                <div
+                                                                    className="aspect-h-1 aspect-w-1 w-full flex-shrink-0 overflow-hidden rounded-lg sm:aspect-none sm:h-40 sm:w-40">
                                                                     <img
-                                                                        className="h-12 w-12 flex-none rounded-full bg-gray-50"
                                                                         src={`${assetServer}/images/products/${order.image}`}
-                                                                        alt=""/>
-                                                                    <div className="min-w-0 flex-auto">
-                                                                        <p className="text-sm font-semibold leading-6 text-gray-900">{order.product_name}</p>
-                                                                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
+                                                                        alt={order.product_name}
+                                                                        className="h-full w-full object-cover object-center sm:h-full sm:w-full"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="mt-6 sm:ml-6 sm:mt-0">
+                                                                    <h3 className="text-base font-medium text-gray-900">
+                                                                        <a href="#">{order.product_name}</a>
+                                                                    </h3>
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">Price - ${order.price}</p>
+                                                                    <p className="mt-3 text-sm text-gray-500">Vendor - {order.store_name}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="mt-6 lg:col-span-5 lg:mt-0">
+                                                                <dl className="grid grid-cols-2 gap-x-6 text-sm">
+                                                                    <div>
+                                                                        <dt className="font-medium text-gray-900">Delivery
+                                                                            address
+                                                                        </dt>
+                                                                        <dd className="mt-3 text-gray-500">
+                                                                            <span
+                                                                                className="block">{order.shipping_address}
+                                                                            </span>
+
+                                                                        </dd>
+                                                                        <dt className="mt-3 font-medium text-gray-900">Delivery
+                                                                            Person
+                                                                        </dt>
+                                                                        <dd className="mt-3 text-gray-500">
+                                                                            <span
+                                                                                className="block">{order.deliverer}
+                                                                            </span>
+
+                                                                        </dd>
+                                                                    </div>
+                                                                    <div>
+                                                                        <dt className="font-medium text-gray-900">Customer Details
+                                                                        </dt>
+                                                                        <dd className="mt-3 space-y-3 text-gray-500">
+                                                                            <p>{order.name}</p>
+                                                                            <p>{order.phone}</p>
+                                                                            <p>{order.email}</p>
+                                                                            {/*<button type="button"*/}
+                                                                            {/*        className="font-medium text-primary hover:text-indigo-500">*/}
+                                                                            {/*    Edit*/}
+                                                                            {/*</button>*/}
+                                                                        </dd>
+                                                                    </div>
+                                                                </dl>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            className="border-t border-gray-200 px-4 py-6 sm:px-6 lg:p-8">
+                                                            <h4 className="sr-only">Status</h4>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {order.status} on -
+                                                                <time dateTime="2021-03-22"
+                                                                                        className="font-medium text-gray-900">
+                                                                 {new Date(order.updated_at).toLocaleDateString()}
+                                                            </time>
+                                                            </p>
+                                                            <div className="mt-6" aria-hidden="true">
+                                                                <div
+                                                                    className="overflow-hidden rounded-full bg-gray-200">
+                                                                    <div
+                                                                        className="h-2 rounded-full bg-primary"
+                                                                        style={{width: `calc((${step} * 2 + 1) / 8 * 100%)`}}
+                                                                    />
+                                                                </div>
+                                                                <div
+                                                                    className="mt-6 hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
+                                                                    <div className="text-primary">Order placed</div>
+                                                                    <div
+                                                                        className={classNames(order.status === 'pending' ? 'text-primary' : '', 'text-center')}>
+                                                                        Processing
+                                                                    </div>
+                                                                    <div
+                                                                        className={classNames(order.status === 'shipped' ? 'text-primary' : '', 'text-center')}>
+                                                                        Shipped
+                                                                    </div>
+                                                                    <div
+                                                                        className={classNames(order.status === 'completed' ? 'text-primary' : '', 'text-right')}>
+                                                                        Delivered
                                                                     </div>
                                                                 </div>
-                                                                <a
-                                                                    href={order.href}
-                                                                    className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                                                >
-                                                                    View
-                                                                </a>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                    <a
-                                                        href="#"
-                                                        className="flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                                                    >
-                                                        View all
-                                                    </a>
-                                                </div>
-
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                    </section>
-                                </div>
 
-                                {/* Right column */}
-                                <div className="grid grid-cols-1 gap-4">
-                                    <section aria-labelledby="section-2-title">
-                                        <h2 className="text-primary" id="section-2-title">
-                                            Recent Products
-                                        </h2>
-                                        <div className="overflow-hidden rounded-lg bg-white shadow">
-                                            <div className="p-6">
-                                                <div className="flow-root">
-                                                    <ul role="list" className="-mb-8">
-                                                        {products.slice(0, 4).map((product) => (
-                                                            <tr key={product.id}>
-                                                                <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
-                                                                    <div className="flex items-center">
-                                                                        <div className="h-11 w-11 flex-shrink-0">
-                                                                            <img className="h-11 w-11 rounded-full"
-                                                                                 src={`${assetServer}/images/products/${product.image}`}
-                                                                                 alt=""/>
-                                                                        </div>
-                                                                        <div className="ml-4">
-                                                                            <div
-                                                                                className="font-medium text-gray-900">{product.product_name}</div>
-                                                                            <div
-                                                                                className="mt-1 text-gray-500">$ {product.price}</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </ul>
-                                                </div>
+                                        {/*/!* Billing *!/*/}
+                                        {/*<div className="mt-16">*/}
+                                        {/*    <h2 className="sr-only">Billing Summary</h2>*/}
 
-                                            </div>
-                                        </div>
-                                    </section>
+                                        {/*    <div*/}
+                                        {/*        className="bg-gray-100 px-4 py-6 sm:rounded-lg sm:px-6 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8 lg:py-8">*/}
+                                        {/*        <table*/}
+                                        {/*            className="table-auto text-sm sm:grid-cols-2 md:gap-x-8 lg:col-span-7">*/}
+                                        {/*            <tbody>*/}
+                                        {/*            <tr>*/}
+                                        {/*                <td className="font-medium text-gray-900">Billing address</td>*/}
+                                        {/*                <td className="mt-3 text-gray-500">*/}
+                                        {/*                    <div>Floyd Miles</div>*/}
+                                        {/*                    <div>7363 Cynthia Pass</div>*/}
+                                        {/*                    <div>Toronto, ON N3Y 4H8</div>*/}
+                                        {/*                </td>*/}
+                                        {/*            </tr>*/}
+                                        {/*            <tr>*/}
+                                        {/*                <td className="font-medium text-gray-900">Payment information*/}
+                                        {/*                </td>*/}
+                                        {/*                <td className="-ml-4 -mt-1 flex flex-wrap">*/}
+                                        {/*                    <div className="ml-4 mt-4 flex-shrink-0">*/}
+                                        {/*                        /!* SVG for Visa logo *!/*/}
+                                        {/*                    </div>*/}
+                                        {/*                    <div className="ml-4 mt-4">*/}
+                                        {/*                        <div className="text-gray-900">Ending with 4242</div>*/}
+                                        {/*                        <div className="text-gray-600">Expires 02 / 24</div>*/}
+                                        {/*                    </div>*/}
+                                        {/*                </td>*/}
+                                        {/*            </tr>*/}
+                                        {/*            </tbody>*/}
+                                        {/*        </table>*/}
+
+                                        {/*        <table*/}
+                                        {/*            className="mt-8 divide-y divide-gray-200 text-sm lg:col-span-5 lg:mt-0">*/}
+                                        {/*            <tbody>*/}
+                                        {/*            <tr>*/}
+                                        {/*                <td className="text-gray-600">Subtotal</td>*/}
+                                        {/*                <td className="font-medium text-gray-900">$72</td>*/}
+                                        {/*            </tr>*/}
+                                        {/*            <tr>*/}
+                                        {/*                <td className="text-gray-600">Shipping</td>*/}
+                                        {/*                <td className="font-medium text-gray-900">$5</td>*/}
+                                        {/*            </tr>*/}
+                                        {/*            <tr>*/}
+                                        {/*                <td className="text-gray-600">Tax</td>*/}
+                                        {/*                <td className="font-medium text-gray-900">$6.16</td>*/}
+                                        {/*            </tr>*/}
+                                        {/*            <tr>*/}
+                                        {/*                <td className="font-medium text-gray-900">Order total</td>*/}
+                                        {/*                <td className="font-medium text-primary">$83.16</td>*/}
+                                        {/*            </tr>*/}
+                                        {/*            </tbody>*/}
+                                        {/*        </table>*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
+                                    </div>
                                 </div>
                             </div>
+
+
                         </div>
                     </main>
 
@@ -510,4 +509,4 @@ export const Dashboard = () => {
     )
 }
 
-export default Dashboard
+export default OrderDetails
