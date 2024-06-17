@@ -23,6 +23,8 @@ import {
 } from "@heroicons/react/20/solid/index.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {assetServer} from "../../../assetServer.js";
+import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 
 
@@ -54,6 +56,7 @@ function classNames(...classes) {
 
 export const Messages = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -142,6 +145,8 @@ export const Messages = () => {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                                            toast.success('Logout successful!'); // display a toast message
+                                                            navigate("/"); // navigate to home page
                                                         }}
                                                         className={classNames(
                                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -221,6 +226,8 @@ export const Messages = () => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                            toast.success('Logout successful!'); // display a toast message
+                                            navigate("/"); // navigate to home page
                                         }}
                                         className={classNames(
                                             'text-gray-400 hover:bg-red-800 hover:secondary',

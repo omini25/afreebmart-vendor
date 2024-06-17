@@ -22,6 +22,8 @@ import axios from "axios";
 import {assetServer} from "../../../assetServer.js";
 import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid";
 import RequestPayout from "./RequestPayout.jsx";
+import {toast} from "react-toastify";
+import {useNavigate} from "react-router-dom";
 
 
 
@@ -53,6 +55,7 @@ function classNames(...classes) {
 
 export const PaymentRequest = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
     const [payments, setPayments] = useState([]);
@@ -159,6 +162,8 @@ export const PaymentRequest = () => {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                                            toast.success('Logout successful!'); // display a toast message
+                                                            navigate("/"); // navigate to home page
                                                         }}
                                                         className={classNames(
                                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -236,6 +241,8 @@ export const PaymentRequest = () => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                            toast.success('Logout successful!'); // display a toast message
+                                            navigate("/"); // navigate to home page
                                         }}
                                         className={classNames(
                                             'text-gray-400 hover:bg-red-800 hover:secondary',

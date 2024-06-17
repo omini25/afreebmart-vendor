@@ -1,7 +1,6 @@
 import { Fragment, useState } from 'react'
-import { Dialog, Menu, Transition } from '@headlessui/react'
+import { Dialog, Transition } from '@headlessui/react'
 import {
-    Cog6ToothIcon,
     FolderIcon,
     GlobeAltIcon,
     XMarkIcon,
@@ -11,18 +10,18 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/actions';
 import {
     ArrowRightStartOnRectangleIcon,
-    BuildingStorefrontIcon, IdentificationIcon,
     InboxStackIcon,
-    ListBulletIcon,
     ShoppingBagIcon,
-    ShoppingCartIcon, TagIcon,
-    TruckIcon, UserCircleIcon, UserGroupIcon,
+    ShoppingCartIcon,
+    TruckIcon, UserCircleIcon,
     WalletIcon
 } from "@heroicons/react/20/solid/index.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {assetServer} from "../../../assetServer.js";
 import axios from "axios";
 import {server} from "../../server.js";
+import {toast} from "react-toastify";
+import {useNavigate} from "react-router-dom";
 
 
 
@@ -56,30 +55,101 @@ function classNames(...classes) {
 
 export const Profile = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
-    const [email, setEmail] = useState(user ? user.user.email : '');
-    const [name, setName] = useState(user? user.user.name : '');
-    const [phone, setPhone] = useState(user? user.user.phone : '');
+    const [email, setEmail] = useState();
+    const [name, setName] = useState();
+    const [phone, setPhone] = useState();
     const [image, setImage] = useState(user? user.user.image : '');
     const [password, setPassword] = useState('');
+
+    const [store_name, setStore_name] = useState();
+    const [store_description, setStore_description] = useState();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const userData = {
-            name: name,
-            phone: phone,
-            email: email,
-            password: password,
-            image: image
-        };
+        let userData = {};
+
+        if (name) userData.name = name;
+        if (phone) userData.phone = phone;
+        if (email) userData.email = email;
+        if (password) userData.password = password;
+        if (image) userData.image = image;
 
         try {
             const response = await axios.put(`${server}/user/${user.user.id}`, userData);
             console.log(response.data);
+
+            // Update user data in the state
+            setUser({
+                ...user,
+                user: response.data
+            });
+
+            // Update user data in the localStorage
+            localStorage.setItem('user', JSON.stringify({
+                ...user,
+                user: response.data
+            }));
+
+            toast.success('Profile updated successfully!');
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleStoreUpdate = async (event) => {
+        event.preventDefault();
+
+        let storeData = {};
+
+        if (store_name) storeData.store_name = store_name;
+        if (store_description) storeData.store_description = store_description;
+
+        try {
+            const response = await axios.put(`${server}/user/vendor/${user.user.id}`, storeData);
+            console.log(response.data);
+
+            // Update user data in the state
+            setUser({
+                ...user,
+                vendor_info: response.data
+            });
+
+            // Update user data in the localStorage
+            localStorage.setItem('user', JSON.stringify({
+                ...user,
+                vendor_info: response.data
+            }));
+
+            toast.success('Store information updated successfully!');
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        try {
+            // Send a DELETE request to the external API
+            const response = await axios.delete(`${server}/delete/user/${user.user.id}`);
+
+            if (response.status === 200) {
+                // Log the user out
+                dispatch(logout());
+
+                // Clear the local storage
+                localStorage.clear();
+
+                // Display a success message
+                toast.success('Account deleted successfully!');
+
+                // Redirect to the "/" page
+                navigate('/');
+            }
         } catch (error) {
             console.error(error);
         }
@@ -171,13 +241,16 @@ export const Profile = () => {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                                            toast.success('Logout successful!'); // display a toast message
+                                                            navigate("/"); // navigate to home page
                                                         }}
                                                         className={classNames(
                                                             'text-gray-400 hover:bg-red-800 hover:secondary',
                                                             'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                                         )}
                                                     >
-                                                        <ArrowRightStartOnRectangleIcon className="h-6 w-6 shrink-0" aria-hidden="true"/>
+                                                        <ArrowRightStartOnRectangleIcon className="h-6 w-6 shrink-0"
+                                                                                        aria-hidden="true"/>
                                                         Log out
                                                     </a>
                                                 </li>
@@ -249,13 +322,16 @@ export const Profile = () => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                            toast.success('Logout successful!'); // display a toast message
+                                            navigate("/"); // navigate to home page
                                         }}
                                         className={classNames(
                                             'text-gray-400 hover:bg-red-800 hover:secondary',
                                             'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                         )}
                                     >
-                                        <ArrowRightStartOnRectangleIcon className="h-6 w-6 shrink-0" aria-hidden="true"/>
+                                        <ArrowRightStartOnRectangleIcon className="h-6 w-6 shrink-0"
+                                                                        aria-hidden="true"/>
                                         Log out
                                     </a>
                                 </li>
@@ -287,7 +363,7 @@ export const Profile = () => {
                         <button type="button" className="-m-2.5 p-2.5 text-black xl:hidden"
                                 onClick={() => setSidebarOpen(true)}>
                             <span className="sr-only">Open sidebar</span>
-                            <Bars3Icon className="h-5 w-5" aria-hidden="true" />
+                            <Bars3Icon className="h-5 w-5" aria-hidden="true"/>
                         </button>
 
                         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -322,7 +398,7 @@ export const Profile = () => {
                                         <h2 className="text-base font-semibold leading-7 text-black">Personal
                                             Information</h2>
                                         <p className="mt-1 text-sm leading-6 text-gray-400">
-                                            Use a permanent address where you can receive mail.
+                                            Use an active email if you want to receive mail notifications.
                                         </p>
                                     </div>
 
@@ -367,6 +443,7 @@ export const Profile = () => {
                                                         autoComplete="name"
                                                         value={name}
                                                         onChange={e => setName(e.target.value)}
+                                                        placeholder={user? user.user.name : ''}
                                                         className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                                     />
                                                 </div>
@@ -385,6 +462,7 @@ export const Profile = () => {
                                                         autoComplete="phone"
                                                         value={phone}
                                                         onChange={e => setPhone(e.target.value)}
+                                                        placeholder={user? user.user.phone : ''}
                                                         className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                                     />
                                                 </div>
@@ -403,6 +481,7 @@ export const Profile = () => {
                                                         autoComplete="email"
                                                         value={email}
                                                         onChange={e => setEmail(e.target.value)}
+                                                        placeholder={user ? user.user.email : ''}
                                                         className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                                     />
                                                 </div>
@@ -410,14 +489,6 @@ export const Profile = () => {
 
                                         </div>
 
-                                        <div className="mt-8 flex">
-                                            <button
-                                                type="submit"
-                                                className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                                            >
-                                                Save
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -433,21 +504,6 @@ export const Profile = () => {
 
                                     <div className="md:col-span-2">
                                         <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-                                            <div className="col-span-full">
-                                                <label htmlFor="current-password"
-                                                       className="block text-sm font-medium leading-6 text-black">
-                                                    Current password
-                                                </label>
-                                                <div className="mt-2">
-                                                    <input
-                                                        id="current-password"
-                                                        name="current_password"
-                                                        type="password"
-                                                        autoComplete="current-password"
-                                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                                                    />
-                                                </div>
-                                            </div>
 
                                             <div className="col-span-full">
                                                 <label htmlFor="new-password"
@@ -497,6 +553,75 @@ export const Profile = () => {
                             </form>
 
 
+                            <form onSubmit={handleStoreUpdate}>
+                                <div
+                                    className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+                                    <div>
+                                        <h2 className="text-base font-semibold leading-7 text-black">
+                                            Store Information</h2>
+                                        <p className="mt-1 text-sm leading-6 text-gray-400">
+                                            Your Store Information
+                                        </p>
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
+
+                                            <div className="sm:col-span-3">
+                                                <label htmlFor="first-name"
+                                                       className="block text-sm font-medium leading-6 text-black">
+                                                    Store Name
+                                                </label>
+                                                <div className="mt-2">
+                                                    <input
+                                                        type="text"
+                                                        name="store_name"
+                                                        id="store_name"
+                                                        autoComplete="store_name"
+                                                        value={store_name}
+                                                        onChange={e => setStore_name(e.target.value)}
+                                                        placeholder={user ? user.vendor_info.store_name : ''}
+                                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                                <label htmlFor="last-name"
+                                                       className="block text-sm font-medium leading-6 text-black">
+                                                    Store Description
+                                                </label>
+                                                <div className="mt-2">
+                                                    <textarea
+                                                        name="store_description"
+                                                        id="store_description"
+                                                        autoComplete="store_description"
+                                                        value={store_description}
+                                                        onChange={e => setStore_description(e.target.value)}
+                                                        placeholder={user ? user.vendor_info.store_description : ''}
+                                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="md:col-span-2">
+                                                <div className="mt-8 flex">
+                                                    <button
+                                                        type="submit"
+                                                        className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </form>
+
+
                             <div
                                 className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
                                 <div>
@@ -510,7 +635,8 @@ export const Profile = () => {
 
                                 <form className="flex items-start md:col-span-2">
                                     <button
-                                        type="submit"
+                                        type="button"
+                                        onClick={handleDeleteAccount}
                                         className="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
                                     >
                                         Yes, delete my account

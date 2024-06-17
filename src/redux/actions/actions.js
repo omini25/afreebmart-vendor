@@ -11,17 +11,20 @@ import axios from "axios";
 import {server} from "../../server.js";
 
 
-export const signup = (name, store_name, store_description, email, password) => {
+export const signup = (formData) => {
     return async (dispatch) => {
         dispatch({ type: SIGNUP_REQUEST });
         try {
-            const response = await fetch(`${server}/vendor-register`, {
+            const response = await fetch(`${server}/vendor/registers`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, store_name, store_description, email, password }),
+                body: JSON.stringify(formData),
             });
+
+            console.log('Server Response:', response); // Log the server response
+
 
             if (!response.status >= 200 && response.status < 300) {
                 throw new Error('Signup failed. Please try again.');
@@ -38,10 +41,20 @@ export const signup = (name, store_name, store_description, email, password) => 
 
             // Display the toast message here, after the signup request is successful
             toast.success('Signup successful!');
+
+            // Return the data object
+            return data;
         } catch (error) {
+            console.error('Signup Error:', error); // Log the error
+
             dispatch({ type: SIGNUP_FAILURE, payload: error.message });
             // Display the toast message here, if the signup request fails
             toast.error('Signup failed. Please try again.');
+
+            console.log('Error Message:', error.message); // Log the error message
+            // Return the error object
+            return { error: error.message };
+
         }
     };
 };

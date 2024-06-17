@@ -20,8 +20,9 @@ import axios from "axios";
 import {server} from "../../server.js";
 import {assetServer} from "../../../assetServer.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
+import {toast} from "react-toastify";
 
 
 
@@ -51,6 +52,7 @@ function classNames(...classes) {
 
 export const OrderDetails = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -166,6 +168,8 @@ export const OrderDetails = () => {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                                            toast.success('Logout successful!'); // display a toast message
+                                                            navigate("/"); // navigate to home page
                                                         }}
                                                         className={classNames(
                                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -189,7 +193,8 @@ export const OrderDetails = () => {
                                                             alt=""
                                                         />
                                                         <span className="sr-only">Your profile</span>
-                                                        <span aria-hidden="true">${user.vendor_info.wallet_balance}</span>
+                                                        <span
+                                                            aria-hidden="true">${user.vendor_info.wallet_balance}</span>
                                                         <span aria-hidden="true">{user.user.name}</span>
                                                     </a>
                                                 </li>
@@ -244,6 +249,8 @@ export const OrderDetails = () => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                            toast.success('Logout successful!'); // display a toast message
+                                            navigate("/"); // navigate to home page
                                         }}
                                         className={classNames(
                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -280,7 +287,7 @@ export const OrderDetails = () => {
                     {/* Sticky search header */}
                     <div
                         className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
-                        <button type="button" className="-m-2.5 p-2.5 text-white xl:hidden"
+                        <button type="button" className="-m-2.5 p-2.5 text-black xl:hidden"
                                 onClick={() => setSidebarOpen(true)}>
                             <span className="sr-only">Open sidebar</span>
                             <Bars3Icon className="h-5 w-5" aria-hidden="true"/>
@@ -355,7 +362,6 @@ export const OrderDetails = () => {
                                                                         <a href="#">{order.product_name}</a>
                                                                     </h3>
                                                                     <p className="mt-2 text-sm font-medium text-gray-900">Price - ${order.price}</p>
-                                                                    <p className="mt-3 text-sm text-gray-500">Vendor - {order.store_name}</p>
                                                                 </div>
                                                             </div>
 

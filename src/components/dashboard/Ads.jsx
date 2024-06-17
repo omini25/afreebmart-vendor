@@ -18,6 +18,9 @@ import {server} from "../../server.js";
 import {assetServer} from "../../../assetServer.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
+import AddAds from "./AddAds.jsx";
+import {toast} from "react-toastify";
+import {useNavigate} from "react-router-dom";
 
 
 
@@ -47,8 +50,10 @@ function classNames(...classes) {
 
 export const Ads = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [isAddAdsOpen, setIsAddAdsOpen] = useState(false);
 
     const [ads, setAds] = useState([]);
 
@@ -66,9 +71,6 @@ export const Ads = () => {
         fetchads();
     }, []);
 
-
-
-    
 
     return (
         <>
@@ -155,6 +157,8 @@ export const Ads = () => {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                                            toast.success('Logout successful!'); // display a toast message
+                                                            navigate("/"); // navigate to home page
                                                         }}
                                                         className={classNames(
                                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -234,6 +238,8 @@ export const Ads = () => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                            toast.success('Logout successful!'); // display a toast message
+                                            navigate("/"); // navigate to home page
                                         }}
                                         className={classNames(
                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -269,7 +275,7 @@ export const Ads = () => {
                 <div className="xl:pl-72">
                     {/* Sticky search header */}
                     <div
-                        className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
+                        className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 bg-transparent px-4 shadow-sm sm:px-6 lg:px-8">
                         <button type="button" className="-m-2.5 p-2.5 text-black xl:hidden"
                                 onClick={() => setSidebarOpen(true)}>
                             <span className="sr-only">Open sidebar</span>
@@ -312,14 +318,20 @@ export const Ads = () => {
                                                     All Ads
                                                 </h2>
                                             </div>
-                                            {/*<div className="mt-4 flex md:ml-4 md:mt-0">*/}
-                                            {/*    <button*/}
-                                            {/*        type="button"*/}
-                                            {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
-                                            {/*    >*/}
-                                            {/*        Add a category*/}
-                                            {/*    </button>*/}
-                                            {/*</div>*/}
+                                            <div className="mt-4 flex md:ml-4 md:mt-0">
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                    onClick={() => setIsAddAdsOpen(true)}
+                                                >
+                                                    Create an Ad
+                                                </button>
+                                            </div>
+
+                                            <div className="fixed top-0 left-0 z-50">
+                                                {isAddAdsOpen &&
+                                                    <AddAds onClose={() => setIsAddAdsOpen(false)}/>}
+                                            </div>
                                         </div>
                                     </header>
                                     <div className="mt-8 flow-root">

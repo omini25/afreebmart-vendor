@@ -1,11 +1,11 @@
 import {Fragment, useEffect, useState} from 'react'
 import { Dialog, Transition } from '@headlessui/react'
+import {useNavigate} from 'react-router-dom';
 import {
     FolderIcon,
     GlobeAltIcon,
     XMarkIcon,
     Bars3Icon,
-    BuildingStorefrontIcon, IdentificationIcon,
     InboxStackIcon,
     MagnifyingGlassIcon, TagIcon, UserCircleIcon,
     UserGroupIcon,
@@ -18,6 +18,7 @@ import {server} from "../../server.js";
 import axios from "axios";
 import {assetServer} from "../../../assetServer.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
+import {toast} from "react-toastify";
 
 
 
@@ -52,12 +53,21 @@ function classNames(...classes) {
 
 export const Dashboard = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [orders, setOrders] = useState([]);
     const user = JSON.parse(localStorage.getItem('user'));
     const [userCount, setUserCount] = useState(0);
     const pendingOrdersCount = orders.filter(order => order.status === 'pending').length;
     const [totalRevenue, setTotalRevenue] = useState(0);
+
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+
+        if (!user) {
+            navigate('/');
+        }
+    }, [navigate]);
 
 
 
@@ -207,6 +217,8 @@ export const Dashboard = () => {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                                            toast.success('Logout successful!'); // display a toast message
+                                                            navigate("/"); // navigate to home page
                                                         }}
                                                         className={classNames(
                                                             'text-gray-400 hover:bg-red-800 hover:secondary',
@@ -230,7 +242,8 @@ export const Dashboard = () => {
                                                             alt=""
                                                         />
                                                         <span className="sr-only">Your profile</span>
-                                                        <span aria-hidden="true">${user.vendor_info.wallet_balance}</span>
+                                                        <span
+                                                            aria-hidden="true">${user.vendor_info.wallet_balance}</span>
                                                         <span aria-hidden="true">{user.user.name}</span>
                                                     </a>
                                                 </li>
@@ -285,6 +298,8 @@ export const Dashboard = () => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             dispatch(logout()); // dispatch the logout action when the link is clicked
+                                            toast.success('Logout successful!'); // display a toast message
+                                            navigate("/"); // navigate to home page
                                         }}
                                         className={classNames(
                                             'text-gray-400 hover:bg-red-800 hover:secondary',

@@ -17,12 +17,27 @@ export const Signup = () => {
 
     const handleSignup = async (event) => {
         event.preventDefault();
-        await dispatch(signup(name, store_name, email, password));
-        if (!error) {
+
+        // Gather form data
+        const formData = {
+            name: name,
+            store_name: store_name,
+            store_description: store_description,
+            email: email,
+            password: password
+        };
+
+        // Dispatch the signup action with the form data
+        const result = await dispatch(signup(formData));
+
+        console.log('Signup Result:', result); // Log the signup result
+
+        if (!result.error) {
             toast.success('Signup successful!');
             navigate('/dashboard');
         } else {
             toast.error('Signup failed!');
+            navigate('/signup');
         }
     };
 
@@ -37,7 +52,7 @@ export const Signup = () => {
                         alt="Your Company"
                     />
                     <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                        Sign up for an account
+                        Sign up for a Vendor account
                     </h2>
                 </div>
 
@@ -51,6 +66,7 @@ export const Signup = () => {
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
                     <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
                         <form className="space-y-6" onSubmit={handleSignup}>
+                            {error && <p>{error}</p>}
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                                     Full Name
@@ -92,10 +108,9 @@ export const Signup = () => {
                                     Store Description
                                 </label>
                                 <div className="mt-2">
-                                    <input
+                                    <textarea
                                         id="name"
                                         name="store_name"
-                                        type="text"
                                         autoComplete="name"
                                         value={store_description}
                                         onChange={e => setStore_Description(e.target.value)}
@@ -151,6 +166,7 @@ export const Signup = () => {
                                     Sign up
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>

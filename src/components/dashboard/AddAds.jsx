@@ -1,15 +1,52 @@
-import { Fragment, useState } from 'react'
+import {Fragment, useEffect, useState} from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {PhotoIcon} from "@heroicons/react/20/solid/index.js";
+import axios from "axios";
+import {server} from "../../server.js";
+import {toast} from "react-toastify";
 
 
-export function RequestPayout({onClose}) {
+export function AddCategory({onClose}) {
     const [open, setOpen] = useState(true)
-    const [payout_amount, setPayout_amount] = useState('');
-    const [bank_name, setBank_name] = useState('');
-    const [account_number, setAccount_number] = useState('');
-    const [account_name, setAccount_name] = useState('');
     const user = JSON.parse(localStorage.getItem('user'));
+    const [products, setProducts] = useState([]);
+    const [duration, setDuration] = useState(0);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
+
+                setProducts(response.data.flat());
+            } catch (error) {
+                console.error('Failed to fetch products:', error);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const formData = {
+            product_id: document.getElementById('product_id').value,
+            duration: document.getElementById('duration').value,
+            amount: document.getElementById('amount').value,
+        };
+
+        try {
+            const response = await axios.post(`${server}/vendor/store/ad/${user.user.id}`, formData);
+            console.log(response.data);
+            // handle successful form submission
+            toast.success('Ad created successfully');
+            // Refresh the page
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to submit form:', error);
+            // handle error
+        }
+    };
 
 
     return (
@@ -30,17 +67,18 @@ export function RequestPayout({onClose}) {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
-                                    <form className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                                    <form className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl" onSubmit={handleSubmit}>
                                         <div className="flex-1">
 
                                             <div className="bg-gray-50 px-4 py-6 sm:px-6">
                                                 <div className="flex items-start justify-between space-x-3">
                                                     <div className="space-y-1">
-                                                        <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                                                            Amount
+                                                        <Dialog.Title
+                                                            className="text-base font-semibold leading-6 text-gray-900">
+                                                            New Ad
                                                         </Dialog.Title>
                                                         <p className="text-sm text-gray-500">
-                                                            Wallet Balance: <span>${user.vendor_info.wallet_balance}</span>
+                                                            Add a new ad to your store
                                                         </p>
                                                     </div>
                                                     <div className="flex h-7 items-center">
@@ -64,19 +102,48 @@ export function RequestPayout({onClose}) {
                                                     className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                                                     <div>
                                                         <label
-                                                            htmlFor="bank_name"
+                                                            htmlFor="project-name"
                                                             className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
                                                         >
-                                                            Bank Name
+                                                            Products
+                                                        </label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <select
+                                                            name="product_id"
+                                                            id="product_id"
+                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                                        >
+                                                            {products.map((product) => (
+                                                                <option
+                                                                    key={product.id}
+                                                                    value={product.id}
+                                                                >
+                                                                    {product.product_name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+
+                                                <div
+                                                    className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label
+                                                            htmlFor="duration"
+                                                            className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                                                        >
+                                                            Number of days
                                                         </label>
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            type="text"
-                                                            name="bank_name"
-                                                            id="bank_name"
-                                                            value={bank_name}
-                                                            onChange={(e) => setBank_name(e.target.value)}
+                                                            type="number"
+                                                            name="duration"
+                                                            id="duration"
+                                                            value={duration}
+                                                            onChange={(e) => setDuration(e.target.value)}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                                         />
                                                     </div>
@@ -86,69 +153,23 @@ export function RequestPayout({onClose}) {
                                                     className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                                                     <div>
                                                         <label
-                                                            htmlFor="account_number"
+                                                            htmlFor="amount"
                                                             className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
                                                         >
-                                                            Bank Account Number
+                                                            Amount
                                                         </label>
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            type="text"
-                                                            name="account_number"
-                                                            id="account_number"
-                                                            value={account_number}
-                                                            onChange={(e) => setAccount_number(e.target.value)}
+                                                            type="number"
+                                                            name="amount"
+                                                            id="amount"
+                                                            value={duration * 1.5}
+                                                            readOnly
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                                         />
                                                     </div>
                                                 </div>
-
-                                                <div
-                                                    className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-                                                    <div>
-                                                        <label
-                                                            htmlFor="account_name"
-                                                            className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                                                        >
-                                                            Bank Account Name
-                                                        </label>
-                                                    </div>
-                                                    <div className="sm:col-span-2">
-                                                        <input
-                                                            type="text"
-                                                            name="account_name"
-                                                            id="account_name"
-                                                            value={account_name}
-                                                            onChange={(e) => setAccount_name(e.target.value)}
-                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div
-                                                    className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-                                                    <div>
-                                                        <label
-                                                            htmlFor="account_name"
-                                                            className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                                                        >
-                                                            Payout Amount
-                                                        </label>
-                                                    </div>
-                                                    <div className="sm:col-span-2">
-                                                        <input
-                                                            type="text"
-                                                            name="payout_amount"
-                                                            id="payout_amount"
-                                                            value={payout_amount}
-                                                            onChange={(e) => setPayout_amount(e.target.value)}
-                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                                                        />
-                                                    </div>
-                                                </div>
-
-
 
                                             </div>
                                         </div>
@@ -167,7 +188,7 @@ export function RequestPayout({onClose}) {
                                                     type="submit"
                                                     className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                                                 >
-                                                    Request Payout
+                                                    Create Ad
                                                 </button>
                                             </div>
                                         </div>
@@ -182,4 +203,4 @@ export function RequestPayout({onClose}) {
     )
 }
 
-export default RequestPayout;
+export default AddCategory;
