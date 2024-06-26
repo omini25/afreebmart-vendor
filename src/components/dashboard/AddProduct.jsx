@@ -11,27 +11,42 @@ export function AddProduct({onClose}) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const user = JSON.parse(localStorage.getItem('user'));
-    const [file, setFile] = useState(null);
+    // const [file, setFile] = useState(null);
+    const [price, setPrice] = useState(0);
+    const [calculatedPrice, setCalculatedPrice] = useState(0);
+    const [bulkPrice, setBulkPrice] = useState(0);
+    const [calculatedBulkPrice, setCalculatedBulkPrice] = useState(0);
 
-    const handleFileChange = (event) => {
+    const handlePriceChange = (event) => {
+        const newPrice = event.target.value;
+        setPrice(newPrice);
+        setCalculatedPrice(newPrice * 0.05);
+    };
+
+    const handleBulkPriceChange = (event) => {
+        const newBulkPrice = event.target.value;
+        setBulkPrice(newBulkPrice);
+        setCalculatedBulkPrice(newBulkPrice * 0.05);
+    };
+
+    const [uploadedImage, setUploadedImage] = useState(null);
+
+    const handleImageChange = (event) => {
         if (event.target.files.length > 0) {
-            setFile(event.target.files[0]);
+            setUploadedImage(URL.createObjectURL(event.target.files[0]));
         }
     };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const formData = new FormData();
-        for (const pair of new FormData(event.target)) {
-            formData.append(pair[0], pair[1]);
-        }
-        formData.append('image', file);
+        const formData = new FormData(event.target);
 
         try {
             const response = await axios.post(`${server}/vendor/products/${user.user.id}`, formData);
             console.log(response.data);
-            toast('Product added successfully', {type: 'success', autoClose: 2000});
+            toast.success('Product added successfully');
 
             // Refresh the page
             window.location.reload();
@@ -282,15 +297,36 @@ export function AddProduct({onClose}) {
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                                                    <label htmlFor="image"
-                                                           className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-primary">
-                                                        <span>Upload a file</span>
-                                                        <input id="image" name="image" type="file" accept="image/*"
-                                                               className="sr-only"
-                                                               onChange={handleFileChange}/>
+                                                <div
+                                                    className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <label htmlFor="cover-photo"
+                                                           className="block text-sm font-medium leading-6 text-gray-900">
+                                                        Product Image
                                                     </label>
-                                                    <p className="pl-1">or drag and drop</p>
+                                                    <div
+                                                        className="mt-2 justify-center rounded-lg border border-dashed border-gray-900/25 sm:col-span-2">
+                                                        <div className="text-center">
+                                                            {uploadedImage ? (
+                                                                <img src={uploadedImage} alt="Uploaded"
+                                                                     className="mx-auto h-12 w-12"/>
+                                                            ) : (
+                                                                <PhotoIcon className="mx-auto h-12 w-12 text-gray-300"
+                                                                           aria-hidden="true"/>
+                                                            )}
+                                                            <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                                                                <label htmlFor="image"
+                                                                       className="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary">
+                                                                    <span>Upload a file</span>
+                                                                    <input id="image" name="image" type="file"
+                                                                           className="sr-only"
+                                                                           onChange={handleImageChange}/>
+                                                                </label>
+                                                                <p className="pl-1">or drag and drop</p>
+                                                            </div>
+                                                            <p className="text-xs leading-5 text-gray-600">PNG, JPG, GIF
+                                                                up to 10MB</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
 
@@ -317,10 +353,8 @@ export function AddProduct({onClose}) {
                                                 <div
                                                     className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                                                     <div>
-                                                        <label
-                                                            htmlFor="price"
-                                                            className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                                                        >
+                                                        <label htmlFor="price"
+                                                               className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5">
                                                             Product Price
                                                         </label>
                                                     </div>
@@ -329,18 +363,19 @@ export function AddProduct({onClose}) {
                                                             type="number"
                                                             name="price"
                                                             id="price"
+                                                            value={price}
+                                                            onChange={handlePriceChange}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                         />
+                                                        <p>5% of the entered value is: {calculatedPrice.toFixed(2)}</p>
                                                     </div>
                                                 </div>
 
                                                 <div
                                                     className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                                                     <div>
-                                                        <label
-                                                            htmlFor="group_price"
-                                                            className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                                                        >
+                                                        <label htmlFor="group_price"
+                                                               className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5">
                                                             Bulk Price
                                                         </label>
                                                     </div>
@@ -349,8 +384,12 @@ export function AddProduct({onClose}) {
                                                             type="number"
                                                             name="group_price"
                                                             id="group_price"
+                                                            value={bulkPrice}
+                                                            onChange={handleBulkPriceChange}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                         />
+                                                        <p>5% of the entered value
+                                                            is: {calculatedBulkPrice.toFixed(2)}</p>
                                                     </div>
                                                 </div>
 
@@ -371,6 +410,33 @@ export function AddProduct({onClose}) {
                                                             id="quantity"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                         />
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label
+                                                            htmlFor="Delivery Options"
+                                                            className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                                                        >
+                                                            Delivery Options
+                                                        </label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <select
+                                                            id="deliverer"
+                                                            name="deliverer"
+                                                            autoComplete="deliverer"
+                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                        >
+                                                            <option value={'afreebmart'}>Product delivered by
+                                                                Afreebmart
+                                                            </option>
+                                                            <option value={`${user.vendor_info.store_name}`}>Product
+                                                                Delivered by your store
+                                                            </option>
+                                                        </select>
                                                     </div>
                                                 </div>
 

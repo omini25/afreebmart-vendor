@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Dialog, Transition, Menu } from '@headlessui/react'
 import {
     Cog6ToothIcon,
 } from '@heroicons/react/24/outline'
@@ -23,6 +23,7 @@ import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
 import {toast} from "react-toastify";
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 
 
@@ -38,8 +39,8 @@ const navigation = [
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
     // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
     // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
 
@@ -55,17 +56,18 @@ export const OrderDetails = () => {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
-
     const { id } = useParams();
     const [order, setOrder] = useState(null);
+
+    const [selectedStatus, setSelectedStatus] = useState('Pending');
 
     useEffect(() => {
         const fetchOrder = async () => {
             try {
                 const response = await axios.get(`${server}/admin/orders/${id}`);
-                // Flatten the array structure
                 const flattenedOrders = response.data.flat()[0];
                 setOrder(flattenedOrders);
+                setSelectedStatus(flattenedOrders.status);
             } catch (error) {
                 console.error('Failed to fetch orders:', error);
             }
@@ -73,6 +75,7 @@ export const OrderDetails = () => {
 
         fetchOrder();
     }, []);
+
 
     const statusToStep = {
         'pending': 1,
@@ -322,20 +325,83 @@ export const OrderDetails = () => {
                             <div className="pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
                                 <div className="bg-gray-50">
                                     <div className="mx-auto max-w-2xl pt-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                                        <div
-                                            className="space-y-2 px-4 sm:flex sm:items-baseline sm:justify-between sm:space-y-0 sm:px-0">
-                                            <div className="flex sm:items-baseline sm:space-x-4">
-                                                <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Order
-                                                    #{id}</h1>
+                                        <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
 
+                                            <div>
+                                                <h1 className="text-base font-semibold leading-6 text-gray-900">
+                                                    Order #{id}
+                                                </h1>
+                                                <p className="text-sm text-gray-600">
+                                                    Order placed{' '}
+                                                    <time dateTime="2021-03-22" className="font-medium text-gray-900">
+                                                        {order && new Date(order.created_at).toLocaleDateString()}
+                                                    </time>
+                                                </p>
                                             </div>
-                                            <p className="text-sm text-gray-600">
-                                                Order placed{' '}
-                                                <time dateTime="2021-03-22" className="font-medium text-gray-900">
-                                                    {order && new Date(order.created_at).toLocaleDateString()}
-                                                </time>
-                                            </p>
+                                            {order && order.deliverer && order.deliverer !== 'afreebmart' && (
+                                                <div className="mt-3 sm:ml-4 sm:mt-0">
+                                                    <p className="pb-1">
+                                                        Change Deliver Status
+                                                    </p>
+                                                    <div className="flex rounded-md shadow-sm">
+                                                        <Menu as="div" className="relative inline-block text-left">
+                                                            <div>
+                                                                <Menu.Button
+                                                                    className="inline-flex justify-between w-full px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                                                                    {selectedStatus}
+                                                                    <ChevronDownIcon className="w-5 h-5 ml-2 -mr-1"
+                                                                                     aria-hidden="true"/>
+                                                                </Menu.Button>
+                                                            </div>
+                                                            <Transition
+                                                                as={Fragment}
+                                                                enter="transition ease-out duration-100"
+                                                                enterFrom="transform opacity-0 scale-95"
+                                                                enterTo="transform opacity-100 scale-100"
+                                                                leave="transition ease-in duration-75"
+                                                                leaveFrom="transform opacity-100 scale-100"
+                                                                leaveTo="transform opacity-0 scale-95"
+                                                            >
+                                                                <Menu.Items
+                                                                    className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                                    <div className="px-1 py-1 ">
+                                                                        {['Pending', 'Shipped', 'Completed'].filter(status => status !== selectedStatus).map((status) => (
+                                                                            <Menu.Item key={status}>
+                                                                                {({active}) => (
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            setSelectedStatus(status);
+                                                                                            fetch(`${server}/vendor/order-status/` + order.id, {
+                                                                                                method: 'PUT',
+                                                                                                headers: {
+                                                                                                    'Content-Type': 'application/json',
+                                                                                                },
+                                                                                                body: JSON.stringify({status}),
+                                                                                            })
+                                                                                                .then(response => response.json())
+                                                                                                .then(data => console.log(data))
+                                                                                                .catch((error) => {
+                                                                                                    console.error('Error:', error);
+                                                                                                });
+                                                                                        }}
+                                                                                        className={`${
+                                                                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                                                                                        } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                                                                                    >
+                                                                                        {status}
+                                                                                    </button>
+                                                                                )}
+                                                                            </Menu.Item>
+                                                                        ))}
+                                                                    </div>
+                                                                </Menu.Items>
+                                                            </Transition>
+                                                        </Menu>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
+
 
                                         {/* Products */}
                                         <div className="mt-6">
@@ -361,7 +427,8 @@ export const OrderDetails = () => {
                                                                     <h3 className="text-base font-medium text-gray-900">
                                                                         <a href="#">{order.product_name}</a>
                                                                     </h3>
-                                                                    <p className="mt-2 text-sm font-medium text-gray-900">Price - ${order.price}</p>
+                                                                    <p className="mt-2 text-sm font-medium text-gray-900">Price
+                                                                        - ${order.price}</p>
                                                                 </div>
                                                             </div>
 
@@ -388,7 +455,8 @@ export const OrderDetails = () => {
                                                                         </dd>
                                                                     </div>
                                                                     <div>
-                                                                        <dt className="font-medium text-gray-900">Customer Details
+                                                                        <dt className="font-medium text-gray-900">Customer
+                                                                            Details
                                                                         </dt>
                                                                         <dd className="mt-3 space-y-3 text-gray-500">
                                                                             <p>{order.name}</p>
@@ -410,9 +478,9 @@ export const OrderDetails = () => {
                                                             <p className="text-sm font-medium text-gray-900">
                                                                 {order.status} on -
                                                                 <time dateTime="2021-03-22"
-                                                                                        className="font-medium text-gray-900">
-                                                                 {new Date(order.updated_at).toLocaleDateString()}
-                                                            </time>
+                                                                      className="font-medium text-gray-900">
+                                                                    {new Date(order.updated_at).toLocaleDateString()}
+                                                                </time>
                                                             </p>
                                                             <div className="mt-6" aria-hidden="true">
                                                                 <div

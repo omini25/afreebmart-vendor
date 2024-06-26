@@ -35,8 +35,8 @@ const navigation = [
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
     // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
     // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
 

@@ -21,6 +21,10 @@ import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js
 import AddProduct from "./AddProduct.jsx";
 import {Link, useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import { Menu } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
 
 
@@ -38,8 +42,8 @@ const navigation = [
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
     // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
     // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
 
@@ -56,13 +60,18 @@ export const Products = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const [products, setProducts] = useState([]);
     const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+    const [selectedSort, setSelectedSort] = useState('Latest');
+    const [searchInput, setSearchInput] = useState('');
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
 
-                setProducts(response.data.flat());
+                const productsData = response.data.products;
+                setProducts(productsData);
+                setFilteredProducts(productsData); // initialize filteredProducts with all products
             } catch (error) {
                 console.error('Failed to fetch products:', error);
             }
@@ -70,6 +79,73 @@ export const Products = () => {
 
         fetchProducts();
     }, []);
+
+    const sortProducts = (products, option) => {
+        switch (option) {
+            case 'Latest':
+                return [...products].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            case 'Pending':
+                return products.filter(product => product.status === 'pending');
+            case 'Suspended':
+                return products.filter(product => product.status === 'suspended');
+            case 'Highest':
+                return [...products].sort((a, b) => b.price - a.price);
+            case 'Lowest':
+                return [...products].sort((a, b) => a.price - b.price);
+            default:
+                return products;
+        }
+    };
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        setSearchInput(value);
+        if (value === '') {
+            setFilteredProducts(products);
+        } else {
+            setFilteredProducts(products.filter(product =>
+                product.product_name.toLowerCase().includes(value.toLowerCase()) ||
+                product.id.toString().includes(value)
+            ));
+        }
+    };
+
+    const createProducts = async (products) => {
+        for (let product of products) {
+            try {
+                await axios.post(`${server}/vendor/products/${user.user.id}`, product);
+            } catch (error) {
+                console.error('Failed to create product:', error);
+            }
+        }
+    };
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async (evt) => {
+            // if it's a CSV file
+            if (file.type === 'text/csv') {
+                Papa.parse(evt.target.result, {
+                    header: true,
+                    complete: async (results) => {
+                        await createProducts(results.data);
+                    }
+                });
+            }
+            // if it's an Excel file
+            else if (file.type.includes('spreadsheetml')) {
+                const workbook = XLSX.read(evt.target.result, { type: 'binary' });
+                const worksheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[worksheetName];
+                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                await createProducts(data);
+            }
+        };
+
+        reader.readAsBinaryString(file);
+    };
 
     return (
         <>
@@ -309,33 +385,124 @@ export const Products = () => {
 
                             <main className="pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
                                 <div className="px-4 sm:px-6 lg:px-8">
-                                    <header
-                                        className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                                        <div className="md:flex md:items-center md:justify-between">
-                                            <div className="min-w-0 flex-1">
-                                                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                                    All Products
-                                                </h2>
-                                            </div>
-                                            <div className="mt-4 flex md:ml-4 md:mt-0">
-                                                <button
-                                                    type="button"
-                                                    className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                                    onClick={() => setIsAddProductOpen(true)}
-                                                >
-                                                    Add a product
-                                                </button>
-                                            </div>
+                                    <div
+                                        className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
+                                        <div>
 
-                                            <div className="fixed top-0 left-0 z-50">
-                                                {isAddProductOpen && <AddProduct onClose={() => setIsAddProductOpen(false)} />}
+                                            <div className="mt-3 flex md:ml-4 md:mt-0">
+                                                {/*<button*/}
+                                                {/*    type="button"*/}
+                                                {/*    className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
+                                                {/*    onClick={() => setIsAddProductOpen(true)}*/}
+                                                {/*>*/}
+                                                {/*    Add a product*/}
+                                                {/*</button>*/}
+                                                {/*<h1 className="text-base font-semibold leading-6 text-gray-900">Products</h1>*/}
+
+                                                <span className="isolate inline-flex rounded-md shadow-sm">
+                                                  <button
+                                                      type="button"
+                                                      className="relative inline-flex items-center rounded-l-md bg-primary px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+                                                      onClick={() => setIsAddProductOpen(true)}
+                                                  >
+                                                    Add a single product
+                                                  </button>
+                                                  <input
+                                                      type="file"
+                                                      accept=".csv, .xlsx"
+                                                      className="relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+                                                      onChange={handleFileUpload}
+                                                  />
+                                                </span>
                                             </div>
                                         </div>
-                                    </header>
+
+                                        {/*<input type="file" accept=".csv, .xlsx" onChange={handleFileUpload}/>*/}
+
+
+                                        <div className="fixed top-0 left-0 z-50">
+                                            {isAddProductOpen &&
+                                                <AddProduct onClose={() => setIsAddProductOpen(false)}/>}
+                                        </div>
+                                        <div className="mt-3 sm:ml-4 sm:mt-0">
+                                            <label htmlFor="mobile-search-candidate" className="sr-only">
+                                                Search
+                                            </label>
+                                            <label htmlFor="desktop-search-candidate" className="sr-only">
+                                                Search
+                                            </label>
+                                            <div className="flex rounded-md shadow-sm">
+                                                <div className="relative flex-grow focus-within:z-10">
+                                                    <div
+                                                        className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400"
+                                                                             aria-hidden="true"/>
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        name="mobile-search-candidate"
+                                                        id="mobile-search-candidate"
+                                                        className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:hidden"
+                                                        placeholder="Search"
+                                                        value={searchInput}
+                                                        onChange={handleSearch}
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        name="desktop-search-candidate"
+                                                        id="desktop-search-candidate"
+                                                        className="hidden w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-sm leading-6 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:block"
+                                                        placeholder="Search Products"
+                                                        value={searchInput}
+                                                        onChange={handleSearch}
+                                                    />
+                                                </div>
+                                                <Menu as="div" className="relative inline-block text-left ml-5">
+                                                    <div>
+                                                        <Menu.Button
+                                                            className="inline-flex justify-between w-full px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                                                            {selectedSort}
+                                                            <ChevronDownIcon className="w-5 h-5 ml-2 -mr-1"
+                                                                             aria-hidden="true"/>
+                                                        </Menu.Button>
+                                                    </div>
+                                                    <Transition
+                                                        as={Fragment}
+                                                        enter="transition ease-out duration-100"
+                                                        enterFrom="transform opacity-0 scale-95"
+                                                        enterTo="transform opacity-100 scale-100"
+                                                        leave="transition ease-in duration-75"
+                                                        leaveFrom="transform opacity-100 scale-100"
+                                                        leaveTo="transform opacity-0 scale-95"
+                                                    >
+                                                        <Menu.Items
+                                                            className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                            <div className="px-1 py-1 ">
+                                                                {['Latest', 'Pending', 'Suspended', 'Highest', 'Lowest'].map((option) => (
+                                                                    <Menu.Item key={option}>
+                                                                        {({active}) => (
+                                                                            <button
+                                                                                onClick={() => setSelectedSort(option)}
+                                                                                className={`${
+                                                                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                                                                                } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                                                                            >
+                                                                                {option}
+                                                                            </button>
+                                                                        )}
+                                                                    </Menu.Item>
+                                                                ))}
+                                                            </div>
+                                                        </Menu.Items>
+                                                    </Transition>
+                                                </Menu>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="mt-8 flow-root">
-                                        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                    <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                                             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                                            <table className="min-w-full divide-y divide-gray-300">
+                                                <table className="min-w-full divide-y divide-gray-300">
                                                     <thead>
                                                     <tr>
                                                         <th scope="col"
@@ -348,7 +515,7 @@ export const Products = () => {
                                                         </th>
                                                         <th scope="col"
                                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                                            Category
+                                                            Category & Type
                                                         </th>
                                                         <th scope="col"
                                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
@@ -356,7 +523,7 @@ export const Products = () => {
                                                         </th>
                                                         <th scope="col"
                                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                                            Stock & Type
+                                                            Stock & Orders
                                                         </th>
                                                         <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                                                             <span className="sr-only">Action</span>
@@ -364,7 +531,7 @@ export const Products = () => {
                                                     </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                                    {products.map((product) => (
+                                                    {sortProducts(filteredProducts, selectedSort).map((product) => (
                                                         <tr key={product.id}>
                                                             <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                                 <div className="flex items-center">
@@ -382,16 +549,18 @@ export const Products = () => {
                                                                 </div>
                                                             </td>
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                                                <div className="text-gray-900">$ {product.group === "1" ? product.group_price : product.price}</div>
-                                                                {/*<div className="mt-1 text-gray-500">*/}
-                                                                {/*  $ {product.group === "1" ? product.group_price : product.price}*/}
-                                                                {/*</div>*/}
+                                                                <div
+                                                                    className="text-gray-900">$ {product.group === "1" ? product.group_price : product.price}
+                                                                </div>
                                                             </td>
 
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                                                 <div className="text-gray-900">{product.category}</div>
                                                                 <div
                                                                     className="mt-1 text-gray-500">{product.subcategory}
+                                                                </div>
+                                                                <div className="mt-1 text-gray-500">
+                                                                    {product.group === "1" ? 'Bulk Product' : 'Main Product'}
                                                                 </div>
                                                             </td>
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
@@ -404,12 +573,12 @@ export const Products = () => {
                                                                 <div
                                                                     className="text-gray-900">{product.stock_status} Qty: {product.quantity}</div>
                                                                 <div className="mt-1 text-gray-500">
-                                                                  {product.group === "1" ? 'Bulk Product' : 'Main Product'}
+                                                                    {product.orders_count}
                                                                 </div>
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                                 <Link to={`/product/${product.id}`}
-                                                                   className="text-indigo-600 hover:text-indigo-900">
+                                                                      className="text-indigo-600 hover:text-indigo-900">
                                                                     View/Edit<span
                                                                     className="sr-only">, {product.name}</span>
                                                                 </Link>

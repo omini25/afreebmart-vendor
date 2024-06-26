@@ -7,9 +7,17 @@ import {
     XMarkIcon,
     Bars3Icon,
     InboxStackIcon,
-    MagnifyingGlassIcon, TagIcon, UserCircleIcon,
+    MagnifyingGlassIcon,
+    TagIcon,
+    UserCircleIcon,
     UserGroupIcon,
-    ShoppingBagIcon, ShoppingCartIcon, TruckIcon, WalletIcon, ArrowRightStartOnRectangleIcon, ListBulletIcon,
+    ShoppingBagIcon,
+    ShoppingCartIcon,
+    TruckIcon,
+    WalletIcon,
+    ArrowRightStartOnRectangleIcon,
+    ListBulletIcon,
+    IdentificationIcon,
 } from '@heroicons/react/20/solid'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/actions';
@@ -35,8 +43,8 @@ const navigation = [
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
     // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
     // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
 

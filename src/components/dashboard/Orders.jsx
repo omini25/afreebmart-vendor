@@ -20,6 +20,10 @@ import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {Link, useNavigate} from "react-router-dom";
 import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
 import {toast} from "react-toastify";
+import { Menu } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+
+
 
 
 
@@ -35,8 +39,8 @@ const navigation = [
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
     // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
     // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
 
@@ -52,8 +56,25 @@ export const Orders = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
     const navigate = useNavigate();
-
     const [orders, setOrders] = useState([]);
+    const [selectedSort, setSelectedSort] = useState('Latest');
+    const [searchInput, setSearchInput] = useState('');
+
+
+    const sortOrders = (orders, option) => {
+        switch (option) {
+            case 'Latest':
+                return [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            case 'Pending':
+                return [...orders].filter(order => order.status === 'pending');
+            case 'Highest':
+                return [...orders].sort((a, b) => b.total_price - a.total_price);
+            case 'Lowest':
+                return [...orders].sort((a, b) => a.total_price - b.total_price);
+            default:
+                return orders;
+        }
+    };
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -70,6 +91,17 @@ export const Orders = () => {
         fetchOrders();
     }, []);
 
+    const filterOrders = (orders, query) => {
+        if (!query) {
+            return orders;
+        }
+
+        return orders.filter((order) => {
+            const orderName = order.product_name ? order.product_name.toLowerCase() : '';
+            const orderId = order.id.toString();
+            return orderName.includes(query.toLowerCase()) || orderId.includes(query);
+        });
+    };
 
 
 
@@ -311,16 +343,84 @@ export const Orders = () => {
 
                             <main className="pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
                                 <div className="px-4 sm:px-6 lg:px-8">
-                                    <header
-                                        className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                                        <div className="md:flex md:items-center md:justify-between">
-                                            <div className="min-w-0 flex-1">
-                                                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                                    Orders
-                                                </h2>
+                                    <div
+                                        className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
+                                        <h1 className="text-base font-semibold leading-6 text-gray-900">Orders</h1>
+                                        <div className="mt-3 sm:ml-4 sm:mt-0">
+                                            <label htmlFor="mobile-search-candidate" className="sr-only">
+                                                Search
+                                            </label>
+                                            <label htmlFor="desktop-search-candidate" className="sr-only">
+                                                Search
+                                            </label>
+                                            <div className="flex rounded-md shadow-sm">
+                                                <div className="relative flex-grow focus-within:z-10">
+                                                    <div
+                                                        className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400"
+                                                                             aria-hidden="true"/>
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        name="mobile-search-candidate"
+                                                        id="mobile-search-candidate"
+                                                        className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:hidden"
+                                                        placeholder="Search"
+                                                        value={searchInput}
+                                                        onChange={(e) => setSearchInput(e.target.value)}
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        name="desktop-search-candidate"
+                                                        id="desktop-search-candidate"
+                                                        className="hidden w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-sm leading-6 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:block"
+                                                        placeholder="Search Orders"
+                                                        value={searchInput}
+                                                        onChange={(e) => setSearchInput(e.target.value)}
+                                                    />
+                                                </div>
+                                                <Menu as="div" className="relative inline-block text-left ml-5">
+                                                    <div>
+                                                        <Menu.Button
+                                                            className="inline-flex justify-between w-full px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                                                            {selectedSort}
+                                                            <ChevronDownIcon className="w-5 h-5 ml-2 -mr-1" aria-hidden="true" />
+                                                        </Menu.Button>
+                                                    </div>
+                                                    <Transition
+                                                        as={Fragment}
+                                                        enter="transition ease-out duration-100"
+                                                        enterFrom="transform opacity-0 scale-95"
+                                                        enterTo="transform opacity-100 scale-100"
+                                                        leave="transition ease-in duration-75"
+                                                        leaveFrom="transform opacity-100 scale-100"
+                                                        leaveTo="transform opacity-0 scale-95"
+                                                    >
+                                                        <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                            <div className="px-1 py-1 ">
+                                                                {['Latest', 'Pending', 'Highest', 'Lowest'].map((option) => (
+                                                                    <Menu.Item key={option}>
+                                                                        {({ active }) => (
+                                                                            <button
+                                                                                onClick={() => setSelectedSort(option)}
+                                                                                className={`${
+                                                                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                                                                                } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                                                                            >
+                                                                                {option}
+                                                                            </button>
+                                                                        )}
+                                                                    </Menu.Item>
+                                                                ))}
+                                                            </div>
+                                                        </Menu.Items>
+                                                    </Transition>
+                                                </Menu>
                                             </div>
                                         </div>
-                                    </header>
+                                    </div>
+
+
                                     <div className="mt-8 flow-root">
                                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                                             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -333,12 +433,12 @@ export const Orders = () => {
                                                         </th>
                                                         <th scope="col"
                                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                                            Customer and Id
+                                                        </th>
+                                                        <th scope="col"
+                                                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                                             Price and Quantity
                                                         </th>
-                                                        {/*<th scope="col"*/}
-                                                        {/*    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">*/}
-                                                        {/*    Customer and Vendor*/}
-                                                        {/*</th>*/}
                                                         <th scope="col"
                                                             className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                                             Delivery Status
@@ -353,13 +453,14 @@ export const Orders = () => {
                                                     </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                                    {orders.map((order) => (
+                                                    {filterOrders(sortOrders(orders, selectedSort), searchInput).map((order) => (
                                                         <tr key={order.id}>
                                                             <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                                 <div className="flex items-center">
                                                                     <div className="h-11 w-11 flex-shrink-0">
                                                                         <img className="h-11 w-11 rounded-full"
-                                                                             src={`${assetServer}/images/products/${order.image}`} alt=""/>
+                                                                             src={`${assetServer}/images/products/${order.image}`}
+                                                                             alt=""/>
                                                                     </div>
                                                                     <div className="ml-4">
                                                                         <div
@@ -369,19 +470,22 @@ export const Orders = () => {
                                                                     </div>
                                                                 </div>
                                                             </td>
+
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                                                <div className="text-gray-900">$ {order.total_price}</div>
+                                                                <div className="text-gray-900">{order.user_name}</div>
+                                                                <div
+                                                                    className="mt-1 text-gray-500">{order.user_id}
+                                                                </div>
+                                                            </td>
+
+                                                            <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
+                                                                <div
+                                                                    className="text-gray-900">$ {order.total_price}</div>
                                                                 <div
                                                                     className="mt-1 text-gray-500">{order.quantity}
                                                                 </div>
                                                             </td>
 
-                                                            {/*<td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">*/}
-                                                            {/*    <div className="text-gray-900">{order.user_name}</div>*/}
-                                                            {/*    <div*/}
-                                                            {/*        className="mt-1 text-gray-500">{order.store_name}*/}
-                                                            {/*    </div>*/}
-                                                            {/*</td>*/}
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                                               <span
                                                                   className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
@@ -389,7 +493,7 @@ export const Orders = () => {
                                                               </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                                              {new Date(order.created_at).toLocaleDateString()}
+                                                                {new Date(order.created_at).toLocaleDateString()}
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                                 <Link to={`/order-details/${order.id}`}

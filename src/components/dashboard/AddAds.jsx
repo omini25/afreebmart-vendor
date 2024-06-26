@@ -4,6 +4,8 @@ import {PhotoIcon} from "@heroicons/react/20/solid/index.js";
 import axios from "axios";
 import {server} from "../../server.js";
 import {toast} from "react-toastify";
+import {loadStripe} from '@stripe/stripe-js';
+
 
 
 export function AddCategory({onClose}) {
@@ -17,7 +19,7 @@ export function AddCategory({onClose}) {
             try {
                 const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
 
-                setProducts(response.data.flat());
+                setProducts(response.data.products);
             } catch (error) {
                 console.error('Failed to fetch products:', error);
             }
@@ -26,25 +28,40 @@ export function AddCategory({onClose}) {
         fetchProducts();
     }, []);
 
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const formData = {
-            product_id: document.getElementById('product_id').value,
-            duration: document.getElementById('duration').value,
-            amount: document.getElementById('amount').value,
-        };
+        const product_id = document.getElementById('product_id').value;
+        const duration = document.getElementById('duration').value;
+        const amount = document.getElementById('amount').value;
 
-        try {
-            const response = await axios.post(`${server}/vendor/store/ad/${user.user.id}`, formData);
-            console.log(response.data);
-            // handle successful form submission
-            toast.success('Ad created successfully');
-            // Refresh the page
-            window.location.reload();
-        } catch (error) {
-            console.error('Failed to submit form:', error);
-            // handle error
+        const stripe = await loadStripe('pk_test_51K4bVzCT7v0Ax3ZCQUKpDk4gTPZ6UuWcJlMpNULOujrGRhsEL4IPAdeZ7KwDXIFEcJ5sLTxm3r2DMCUaQYWbLl2W00W13HDVPl');
+
+        // Call your backend to create the Checkout Session
+        const response = await fetch(`${server}/ads/checkout/${user.user.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_id: product_id,
+                duration: duration,
+                amount: amount
+            })
+        });
+
+        const session = await response.json();
+
+        // When the customer clicks on the button, redirect them to Checkout.
+        const result = await stripe.redirectToCheckout({
+            sessionId: session.id,
+        });
+
+        if (result.error) {
+            // If `redirectToCheckout` fails due to a browser or network
+            // error, display the localized error message to your customer.
+            alert(result.error.message);
         }
     };
 

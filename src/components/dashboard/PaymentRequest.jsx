@@ -40,8 +40,8 @@ const navigation = [
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
     // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
     // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
-    // { name: 'Admins', href: '/admins', icon: IdentificationIcon, current: false },
-    // { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
+    { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
+    { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
 ]
 
@@ -74,6 +74,12 @@ export const PaymentRequest = () => {
 
         fetchPayments();
     }, []);
+
+    const stats = [
+        { name: 'Total Paid Amount ($)', stat: payments.reduce((total, payment) => payment.status === 'paid' ? total + payment.amount : total, 0) },
+        { name: 'Wallet Balance ($)', stat: `${user.vendor_info.wallet_balance}` },
+        { name: 'Number of Requests', stat: payments.length },
+    ]
 
 
 
@@ -307,16 +313,12 @@ export const PaymentRequest = () => {
                         </div>
                     </div>
 
-                    <main className="lg:pr-10 lg:pl-10">
-                        <header
-                            className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                            <div className="md:flex md:items-center md:justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                        Payout Requests
-                                    </h2>
-                                </div>
-                                <div className="mt-4 flex md:ml-4 md:mt-0">
+                    <main className="lg:pr-10 lg:pl-10 ">
+
+                        <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
+                            <h3 className="text-base font-semibold leading-6 text-gray-900">Payout Requests</h3>
+                            <div className="mt-3 sm:ml-4 sm:mt-0">
+                                <div className="flex rounded-md shadow-sm">
                                     <button
                                         type="button"
                                         className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
@@ -325,15 +327,26 @@ export const PaymentRequest = () => {
                                         Request Payout
                                     </button>
                                 </div>
-
                                 <div className="fixed top-0 left-0 z-50">
                                     {isRequestPayoutOpen &&
                                         <RequestPayout onClose={() => setIsRequestPayoutOpen(false)}/>}
                                 </div>
                             </div>
-                        </header>
+                        </div>
 
                         <div>
+
+                            <div>
+                                <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                                    {stats.map((item) => (
+                                        <div key={item.name}
+                                             className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+                                            <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
+                                            <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.stat}</dd>
+                                        </div>
+                                    ))}
+                                </dl>
+                            </div>
 
                             <div className="px-4 sm:px-6 lg:px-8">
 
@@ -377,7 +390,7 @@ export const PaymentRequest = () => {
                                                                     <div
                                                                         className="font-medium text-gray-900">$ {payment.amount}</div>
                                                                     <div
-                                                                        className="mt-1 text-gray-500">#{payment.id}</div>
+                                                                        className="mt-1 text-primary">#{payment.id}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
