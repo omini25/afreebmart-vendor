@@ -349,24 +349,10 @@ export const Messages = () => {
                     </div>
 
                     <main className="lg:pr-10 lg:pl-10">
-                        <header className="border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-                            <div className="md:flex md:items-center md:justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                                        Messages
-                                    </h2>
-                                </div>
-                                {/*<div className="mt-4 flex md:ml-4 md:mt-0">*/}
-                                {/*    <button*/}
-                                {/*        type="button"*/}
-                                {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
-                                {/*        onClick={() => setShowModal(true)}*/}
-                                {/*    >*/}
-                                {/*        Start New Chat*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
-                            </div>
-                        </header>
+                        <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
+                            <h3 className="text-base font-semibold leading-6 text-gray-900">Messages</h3>
+
+                        </div>
 
                         <div className="flex w-full h-full shadow-lg rounded-3xl">
                             <section className="flex flex-col pt-3 w-4/12 bg-gray-50 h-full overflow-y-scroll">

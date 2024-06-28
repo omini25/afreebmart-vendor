@@ -66,6 +66,7 @@ export const login = (email, password) => {
             const response = await axios.post(`${server}/vendor/login`, { email, password });
 
             if (response.status < 200 || response.status >= 300) {
+                toast.error('Invalid email or password.');
                 throw new Error('Login failed. Please try again.');
             }
 
@@ -73,13 +74,21 @@ export const login = (email, password) => {
 
             // Check if the user's role is 'vendor'
             if (data.user.role !== 'vendor') {
-                throw new Error('Access denied. You must be an Vendor to log in.');
+                toast.error('Access denied. You must be a Vendor to log in.');
+                throw new Error('Access denied. You must be a Vendor to log in.');
+            }
+
+            // Check if the user's status is 'suspended'
+            if (data.user.status === 'suspended') {
+                toast.error('Your account is suspended. Please contact support.');
+                throw new Error('Your account is suspended. Please contact support.');
             }
 
             // Save user's details in Redux store
             dispatch({ type: LOGIN_SUCCESS, payload: data });
 
             // Save user's details and isLoggedIn state in localStorage
+            // Only when login is successful
             localStorage.setItem('user', JSON.stringify(data));
             localStorage.setItem('isLoggedIn', true);
 

@@ -70,6 +70,14 @@ export const Dashboard = () => {
     const [totalRevenue, setTotalRevenue] = useState(0);
 
     useEffect(() => {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+        if (isLoggedIn !== 'true') {
+            navigate('/');
+        }
+    }, [navigate]);
+
+    useEffect(() => {
         const user = localStorage.getItem('user');
 
         if (!user) {
