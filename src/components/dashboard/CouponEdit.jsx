@@ -21,7 +21,8 @@ import {server} from "../../server.js";
 import {assetServer} from "../../../assetServer.js";
 import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {AddCoupons} from "./AddCoupons.jsx";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {toast} from "react-toastify";
 
 
 
@@ -64,6 +65,7 @@ export const CouponEdit = () => {
     const [limits, setLimits] = useState('');
     const [start_date, setStartDate] = useState('');
     const [end_date, setEndDate] = useState('');
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -106,6 +108,9 @@ export const CouponEdit = () => {
             // Check if the request was successful
             if (response.status === 200) {
                 // The coupon was successfully updated
+                toast.success('Coupon updated successfully');
+                // navigate('/coupons');
+                // You can add any additional logic here, such as redirecting the user
                 // You can add any additional logic here, such as redirecting the user
             } else {
                 // The request completed, but the status code is not 200
@@ -398,13 +403,10 @@ export const CouponEdit = () => {
                                                     Information</h2>
 
                                                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                                    <div
-                                                        className="sm:col-span-4">
+                                                    <div className="sm:col-span-4">
                                                         <div>
-                                                            <label
-                                                                htmlFor="project-name"
-                                                                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                                                            >
+                                                            <label htmlFor="project-name"
+                                                                   className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5">
                                                                 Coupon Title
                                                             </label>
                                                         </div>
@@ -413,7 +415,7 @@ export const CouponEdit = () => {
                                                                 type="text"
                                                                 name="project-name"
                                                                 id="project-name"
-                                                                value={title}
+                                                                value={coupons.title}
                                                                 onChange={(e) => setTitle(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
@@ -435,7 +437,7 @@ export const CouponEdit = () => {
                                                                 type="text"
                                                                 name="project-name"
                                                                 id="project-name"
-                                                                value={code}
+                                                                value={coupons.code}
                                                                 onChange={(e) => setCode(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
@@ -456,7 +458,7 @@ export const CouponEdit = () => {
                                                             <select
                                                                 name="discount_type"
                                                                 id="discount_type"
-                                                                value={discount_type}
+                                                                value={coupons.discount_type}
                                                                 onChange={(e) => setDiscountType(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             >
@@ -481,7 +483,7 @@ export const CouponEdit = () => {
                                                                 type="text"
                                                                 name="discount"
                                                                 id="discount"
-                                                                value={discount}
+                                                                value={coupons.discount}
                                                                 onChange={(e) => setDiscount(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
@@ -503,7 +505,7 @@ export const CouponEdit = () => {
                                                                 type="text"
                                                                 name="project-name"
                                                                 id="project-name"
-                                                                value={quantity}
+                                                                value={coupons.quantity}
                                                                 onChange={(e) => setQuantity(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
@@ -525,7 +527,7 @@ export const CouponEdit = () => {
                                                                 type="text"
                                                                 name="project-name"
                                                                 id="project-name"
-                                                                value={limits}
+                                                                value={coupons.limits}
                                                                 onChange={(e) => setLimits(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
@@ -547,7 +549,7 @@ export const CouponEdit = () => {
                                                                 type="date"
                                                                 name="project-name"
                                                                 id="project-name"
-                                                                value={start_date}
+                                                                value={coupons.start_date}
                                                                 onChange={(e) => setStartDate(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
@@ -570,7 +572,7 @@ export const CouponEdit = () => {
                                                                 type="date"
                                                                 name="project-name"
                                                                 id="project-name"
-                                                                value={end_date}
+                                                                value={coupons.end_date}
                                                                 onChange={(e) => setEndDate(e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />

@@ -67,6 +67,7 @@ export const login = (email, password) => {
 
             if (response.status < 200 || response.status >= 300) {
                 toast.error('Invalid email or password.');
+                window.location.href = '/';
                 throw new Error('Login failed. Please try again.');
             }
 
@@ -75,12 +76,14 @@ export const login = (email, password) => {
             // Check if the user's role is 'vendor'
             if (data.user.role !== 'vendor') {
                 toast.error('Access denied. You must be a Vendor to log in.');
+                window.location.href = '/';
                 throw new Error('Access denied. You must be a Vendor to log in.');
             }
 
             // Check if the user's status is 'suspended'
             if (data.user.status === 'suspended') {
                 toast.error('Your account is suspended. Please contact support.');
+                window.location.href = '/';
                 throw new Error('Your account is suspended. Please contact support.');
             }
 
@@ -97,6 +100,8 @@ export const login = (email, password) => {
         } catch (error) {
             dispatch({ type: LOGIN_FAILURE, payload: error.message });
             // Display the toast message here, if the login request fails
+            toast.error('Login failed. Please try again.');
+            window.location.href = '/';
             toast.error(error.message);
             return error;
         }

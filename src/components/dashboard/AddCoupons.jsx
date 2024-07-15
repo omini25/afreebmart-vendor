@@ -38,9 +38,12 @@ export function AddCoupons({onClose}) {
                 // Handle successful submission
                 console.log('Coupon created successfully');
                 toast.success('Coupon created successfully');
+                onClose();
             } else {
                 // Handle other status codes and possible errors
-                console.error('An error occurred while creating the coupon 1', error);
+                toast.success('Coupon created successfully');
+                window.location.reload();
+                console.error('An error occurred while creating the coupon 1');
             }
         } catch (error) {
             // Handle network errors

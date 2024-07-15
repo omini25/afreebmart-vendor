@@ -1,6 +1,6 @@
 import {Fragment, useEffect, useState} from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {
     FolderIcon,
     GlobeAltIcon,
@@ -473,17 +473,17 @@ export const Dashboard = () => {
                                                                         <p className="mt-1 truncate text-xs leading-5 text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
-                                                                <a
-                                                                    href={order.href}
+                                                                <Link
+                                                                    to={`/order-details/${order.id}`}
                                                                     className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                                 >
                                                                     View
-                                                                </a>
+                                                                </Link>
                                                             </li>
                                                         ))}
                                                     </ul>
                                                     <a
-                                                        href="#"
+                                                        href="/orders"
                                                         className="flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                                                     >
                                                         View all

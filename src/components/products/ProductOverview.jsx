@@ -63,7 +63,7 @@ export const ProductOverview = ({ product, onClose, open }) =>  {
                                     <div className="grid w-full grid-cols-1 items-start gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
                                         <div className="sm:col-span-4 lg:col-span-5">
                                             <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100">
-                                                <img src={`https://afreebmart.com/images/products/${product.image}`} alt={product.product_name} className="object-cover object-center" />
+                                                <img src={`https://api.afreebmart.com/images/products/${product.image}`} alt={product.product_name} className="object-cover object-center" />
                                             </div>
                                         </div>
                                         <div className="sm:col-span-8 lg:col-span-7">

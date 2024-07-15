@@ -147,13 +147,14 @@ export function AddProduct({onClose}) {
                                                             name="product_name"
                                                             id="product_name"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                            required
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <div
                                                     className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-                                                    <div>
+                                                <div>
                                                         <label
                                                             htmlFor="category"
                                                             className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
@@ -168,6 +169,7 @@ export function AddProduct({onClose}) {
                                                             autoComplete="category"
                                                             onChange={handleCategoryChange}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                            required
                                                         >
                                                             <option>Select a category</option>
                                                             {categories.map(category => (
@@ -221,6 +223,7 @@ export function AddProduct({onClose}) {
                                                             name="unit"
                                                             id="unit"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                            required
                                                         >
                                                             <option value={`KG`}>KG</option>
                                                             <option value={`Litre`}>Litre</option>
@@ -268,6 +271,7 @@ export function AddProduct({onClose}) {
                                                             name="group"
                                                             autoComplete="bulk-product"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                            required
                                                         >
                                                             <option value={0}>No</option>
                                                             <option value={1}>Yes</option>
@@ -293,6 +297,7 @@ export function AddProduct({onClose}) {
                                                             rows={3}
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             defaultValue={''}
+                                                            required
                                                         />
                                                     </div>
                                                 </div>
@@ -319,7 +324,9 @@ export function AddProduct({onClose}) {
                                                                     <span>Upload a file</span>
                                                                     <input id="image" name="image" type="file"
                                                                            className="sr-only"
-                                                                           onChange={handleImageChange}/>
+                                                                           onChange={handleImageChange}
+                                                                            required
+                                                                    />
                                                                 </label>
                                                                 <p className="pl-1">or drag and drop</p>
                                                             </div>
@@ -346,6 +353,7 @@ export function AddProduct({onClose}) {
                                                             name="shipping_weight"
                                                             id="shipping_weight"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                            required
                                                         />
                                                     </div>
                                                 </div>
@@ -409,6 +417,7 @@ export function AddProduct({onClose}) {
                                                             name="quantity"
                                                             id="quantity"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                            required
                                                         />
                                                     </div>
                                                 </div>
@@ -429,6 +438,7 @@ export function AddProduct({onClose}) {
                                                             name="deliverer"
                                                             autoComplete="deliverer"
                                                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                                            required
                                                         >
                                                             <option value={'afreebmart'}>Product delivered by
                                                                 Afreebmart

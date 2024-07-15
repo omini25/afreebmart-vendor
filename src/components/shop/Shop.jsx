@@ -126,7 +126,7 @@ export const Shop = ({products}) => {
                                     <div
                                         className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
                                         <img
-                                            src={`https://afreebmart.com/images/products/${product.image}`}
+                                            src={`https://api.afreebmart.com/images/products/${product.image}`}
                                             alt={product.product_name}
                                             className="h-full w-full object-cover object-center sm:h-full sm:w-full"
                                         />

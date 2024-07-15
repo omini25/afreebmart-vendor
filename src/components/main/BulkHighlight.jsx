@@ -42,7 +42,7 @@ export const BulkHighlight = () => {
                                 <div className="slide-ana lg:relative">
                                     <div  style={{transform: "translateX(-100%)"}}>
                                         <img
-                                            src={`https://afreebmart.com/images/products/${product.image}`}
+                                            src={`https://api.afreebmart.com/images/products/${product.image}`}
                                             alt={product.product_name} className="w-full h-full"/>
                                     </div>
                                 </div>

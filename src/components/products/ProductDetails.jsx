@@ -106,7 +106,7 @@ export const ProductDetails = ({product}) => {
                                     <>
                                         <span className="sr-only">{product.image}</span>
                                         <span className="absolute inset-0 overflow-hidden rounded-md">
-                                            <img src={`https://afreebmart.com/images/products/${product.image}`} alt=""
+                                            <img src={`https://api.afreebmart.com/images/products/${product.image}`} alt=""
                                                  className="h-full w-full object-cover object-center"/>
                                         </span>
                                         <span
@@ -121,7 +121,7 @@ export const ProductDetails = ({product}) => {
                         <Tab.Panels className="aspect-h-1 aspect-w-1 w-full">
                             <Tab.Panel>
                                 <img
-                                    src={`https://afreebmart.com/images/products/${product.image}`}
+                                    src={`https://api.afreebmart.com/images/products/${product.image}`}
                                     alt={product.product_name}
                                     className="h-full w-full object-cover object-center sm:rounded-lg"
                                 />
@@ -252,7 +252,7 @@ export const ProductDetails = ({product}) => {
                                                 navigator.share({
                                                     title: product.product_name,
                                                     text: product.description,
-                                                    url: `https://afreebmart.com/products/${product.id}`,
+                                                    url: `https://api.afreebmart.com/products/${product.id}`,
                                                 })
                                             }}
                                                     className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-500">
@@ -271,7 +271,7 @@ export const ProductDetails = ({product}) => {
                                                 navigator.share({
                                                     title: product.product_name,
                                                     text: product.description,
-                                                    url: `https://afreebmart.com/products/${product.id}`,
+                                                    url: `https://api.afreebmart.com/products/${product.id}`,
                                                 })
                                             }}
                                                     className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-500">
@@ -291,7 +291,7 @@ export const ProductDetails = ({product}) => {
                                                 navigator.share({
                                                     title: product.product_name,
                                                     text: product.description,
-                                                    url: `https://afreebmart.com/products/${product.id}`,
+                                                    url: `https://api.afreebmart.com/products/${product.id}`,
                                                 })
                                             }}
                                                     className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-500">

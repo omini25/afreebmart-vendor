@@ -34,7 +34,7 @@ export const Login = () => {
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <img
                         className="mx-auto h-10 w-auto"
-                        src="https://afreebmart.com/backend/images/logo/afreemart-logo.png"
+                        src="https://api.afreebmart.com/backend/images/logo/afreemart-logo.png"
                         alt="Your Company"
                     />
                     <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -91,7 +91,7 @@ export const Login = () => {
                                 </div>
 
                                 <div className="text-sm leading-6">
-                                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                    <a href="#" className="font-semibold text-primary hover:text-secondary">
                                         Forgot password?
                                     </a>
                                 </div>
@@ -100,7 +100,7 @@ export const Login = () => {
                             <div>
                                 <button
                                     type="submit" disabled={loading}
-                                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                                 >
                                     Log in
                                 </button>
@@ -120,7 +120,7 @@ export const Login = () => {
 
                             <p className="mt-10 text-center text-sm text-gray-500">
                                 Not a vendor?{' '}
-                                <a href="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                                <a href="/signup" className="font-semibold leading-6 text-primary hover:text-secondary">
                                     Sign Up
                                 </a>
                             </p>

@@ -86,6 +86,9 @@ export const Products = () => {
                 return [...products].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             case 'Pending':
                 return products.filter(product => product.status === 'pending');
+            case 'Active':
+                return products.filter(product => product.status === 'active');
+            case 'Out of Stock':
             case 'Suspended':
                 return products.filter(product => product.status === 'suspended');
             case 'Highest':
@@ -478,7 +481,7 @@ export const Products = () => {
                                                         <Menu.Items
                                                             className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                                             <div className="px-1 py-1 ">
-                                                                {['Latest', 'Pending', 'Suspended', 'Highest', 'Lowest'].map((option) => (
+                                                                {['Latest', 'Active', 'Pending', 'Suspended', 'Highest', 'Lowest'].map((option) => (
                                                                     <Menu.Item key={option}>
                                                                         {({active}) => (
                                                                             <button

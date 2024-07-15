@@ -50,7 +50,7 @@ export const FeaturedProducts = () => {
                                             <HeartIcon className="h-8 w-8 text-primary" aria-hidden="true"/>
                                         </div>
                                         <img
-                                            src={`https://afreebmart.com/images/products/${product.image}`}
+                                            src={`https://api.afreebmart.com/images/products/${product.image}`}
                                             alt={product.product_name}
                                             className="h-full w-full object-cover object-center"
                                         />

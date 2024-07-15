@@ -61,6 +61,7 @@ export const Messages = () => {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user && user.user ? user.user.id : null;
     const [chats, setChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -348,11 +349,20 @@ export const Messages = () => {
                         </div>
                     </div>
 
-                    <main className="lg:pr-10 lg:pl-10">
+                    <main className="lg:pr-10 lg:pl-10 pb-14 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
                         <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
                             <h3 className="text-base font-semibold leading-6 text-gray-900">Messages</h3>
-
+                            {/*<div className="mt-3 sm:ml-4 sm:mt-0">*/}
+                            {/*    <button*/}
+                            {/*        type="button"*/}
+                            {/*        className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"*/}
+                            {/*        onClick={() => setShowModal(true)}*/}
+                            {/*    >*/}
+                            {/*        Start New Chat*/}
+                            {/*    </button>*/}
+                            {/*</div>*/}
                         </div>
+
 
                         <div className="flex w-full h-full shadow-lg rounded-3xl">
                             <section className="flex flex-col pt-3 w-4/12 bg-gray-50 h-full overflow-y-scroll">
@@ -366,8 +376,8 @@ export const Messages = () => {
                                     {chats.map((chat) => (
                                         <li
                                             key={chat.id}
-                                            className={`py-5 border-b px-3 transition hover:bg-indigo-100 cursor-pointer ${
-                                                selectedChat && selectedChat.id === chat.id ? 'bg-indigo-600 text-white' : ''
+                                            className={`py-5 border-b px-3 transition hover:bg-secondary cursor-pointer ${
+                                                selectedChat && selectedChat.id === chat.id ? 'bg-primary text-white' : ''
                                             }`}
                                             onClick={() => handleChatSelect(chat)}
                                         >
@@ -401,7 +411,7 @@ export const Messages = () => {
                                                 <div className="flex flex-col">
                                                     <h3 className="font-semibold text-lg">{selectedChat.subject}</h3>
                                                     <p className="text-light text-gray-400">
-                                                        {selectedChat.participants.length} participants
+                                                        {selectedChat?.participants?.length} participants
                                                     </p>
                                                 </div>
                                             </div>
@@ -409,7 +419,10 @@ export const Messages = () => {
 
                                         <div className="flex-grow overflow-y-auto mb-4">
                                             {messages.map((message) => (
-                                                <div key={message.id} className="mb-4">
+                                                <div
+                                                    key={message.id}
+                                                    className={`mb-4 ${message.user.id === userId ? 'text-right' : 'text-left'}`}
+                                                >
                                                     <p className="font-semibold">{message.user.name}</p>
                                                     <p className="bg-gray-100 p-2 rounded-lg inline-block">{message.body}</p>
                                                 </div>
@@ -417,13 +430,13 @@ export const Messages = () => {
                                         </div>
 
                                         <section className="mt-6 border rounded-xl bg-gray-50 mb-3">
-              <textarea
-                  className="w-full bg-gray-50 p-2 rounded-xl"
-                  placeholder="Type your reply here..."
-                  rows={3}
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-              />
+                                              <textarea
+                                                  className="w-full bg-gray-50 p-2 rounded-xl"
+                                                  placeholder="Type your reply here..."
+                                                  rows={3}
+                                                  value={newMessage}
+                                                  onChange={(e) => setNewMessage(e.target.value)}
+                                              />
                                             <div className="flex items-center justify-between p-2">
                                                 <button className="h-6 w-6 text-gray-400">
                                                     <svg
@@ -441,7 +454,7 @@ export const Messages = () => {
                                                     </svg>
                                                 </button>
                                                 <button
-                                                    className="bg-purple-600 text-white px-6 py-2 rounded-xl"
+                                                    className="bg-primary text-white px-6 py-2 rounded-xl"
                                                     onClick={handleSendMessage}
                                                 >
                                                     Reply
@@ -471,7 +484,7 @@ export const Messages = () => {
                                     />
                                     <div className="flex justify-end">
                                         <button
-                                            className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+                                            className="bg-primary text-white px-4 py-2 rounded mr-2"
                                             onClick={handleCreateChat}
                                         >
                                             Create Chat

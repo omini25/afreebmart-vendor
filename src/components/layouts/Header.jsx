@@ -313,7 +313,7 @@ export const Header = () => {
                                 <div className="ml-4 flex lg:ml-0">
                                     <a href="/">
                                         <span className="sr-only">Afreebmart</span>
-                                        <img src="https://afreebmart.com/backend/images/logo/afreemart-logo.png"
+                                        <img src="https://api.afreebmart.com/backend/images/logo/afreemart-logo.png"
                                              alt="Afreebmart Logo" style={{width: '240px', height: '50px'}}/>
                                     </a>
                                 </div>
@@ -485,7 +485,7 @@ export const Header = () => {
                                         <Popover.Button className="-m-2 p-2 text-gray-400 hover:text-gray-500">
                                             <span className="sr-only">Account</span>
                                             {user.isLoggedIn ? (
-                                                <img src={`https://afreebmart.com/${user.user.image}`} alt="User"
+                                                <img src={`https://api.afreebmart.com/${user.user.image}`} alt="User"
                                                      className="h-7 w-7 rounded-full"/>
                                             ) : (
                                                 <UserIcon className="h-7 w-7" aria-hidden="true" />

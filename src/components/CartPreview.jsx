@@ -84,7 +84,7 @@ export const CartPreview = ({ setIsCartPreviewOpen }) => {
         //                                                         <div
         //                                                             className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
         //                                                             <img
-        //                                                                 src={`https://afreebmart.com/images/products/${product.image}`}
+        //                                                                 src={`https://api.afreebmart.com/images/products/${product.image}`}
         //                                                                 alt={product.product_name}
         //                                                                 className="h-full w-full object-cover object-center"
         //                                                             />

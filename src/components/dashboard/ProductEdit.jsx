@@ -118,7 +118,18 @@ export const ProductEdit = () => {
         const updatedFields = {};
         if (productName !== products.product_name) updatedFields.product_name = productName;
         if (category !== products.category) updatedFields.category = category;
-        // ... repeat for all form fields
+        if (subcategory !== products.subcategory) updatedFields.subcategory = subcategory;
+        if (unit !== products.unit) updatedFields.unit = unit;
+        if (tags !== products.tags) updatedFields.tags = tags;
+        if (description !== products.description) updatedFields.description = description;
+        if (image !== products.image) updatedFields.image = image;
+        if (shippingWeight !== products.shipping_weight) updatedFields.shipping_weight = shippingWeight;
+        if (price !== products.price) updatedFields.price = price;
+        if (groupPrice !== products.group_price) updatedFields.group_price = groupPrice;
+        if (quantity !== products.quantity) updatedFields.quantity = quantity;
+        if (deliverer !== products.deliverer) updatedFields.deliverer = deliverer;
+        if (group !== products.group) updatedFields.group = group;
+        if (status !== products.status) updatedFields.status = status;
 
         try {
             const response = await axios.put(`${server}/vendor/products/${id}`, updatedFields);

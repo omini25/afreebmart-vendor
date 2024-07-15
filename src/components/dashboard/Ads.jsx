@@ -20,23 +20,17 @@ import banknotesIcon from "@heroicons/react/16/solid/esm/BanknotesIcon.js";
 import {ArrowRightStartOnRectangleIcon} from "@heroicons/react/20/solid/index.js";
 import AddAds from "./AddAds.jsx";
 import {toast} from "react-toastify";
-import {useNavigate} from "react-router-dom";
-
-
-
+import {useNavigate, useLocation} from "react-router-dom";
 
 const navigation = [
     { name: 'Overview', href: '/dashboard', icon: FolderIcon, current: false },
     { name: 'Orders', href: '/orders', icon: ShoppingCartIcon, current: false },
     { name: 'Products', href: '/products', icon: ShoppingBagIcon, current: false },
-    // { name: 'Categories', href: '/categories', icon: ListBulletIcon, current: false },
     { name: 'Ads', href: '/ads', icon: GlobeAltIcon, current: true },
     { name: 'Deliveries', href: '/deliveries', icon: TruckIcon, current: false },
     { name: 'Payment History', href: '/payments', icon: banknotesIcon, current: false },
     { name: 'Payment Request', href: '/payments-requests', icon: WalletIcon, current: false },
     { name: 'Messages', href: '/messages', icon: InboxStackIcon, current: false },
-    // { name: 'Users', href: '/users', icon: UserGroupIcon, current: false },
-    // { name: 'Vendors', href: '/vendors', icon: BuildingStorefrontIcon, current: false },
     { name: 'Reviews', href: '/reviews', icon: IdentificationIcon, current: false },
     { name: 'Coupons', href: '/coupons', icon: TagIcon, current: false },
     { name: 'Profile', href: '/profile', icon: UserCircleIcon, current: false },
@@ -46,11 +40,10 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-
-
 export const Ads = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
     const user = JSON.parse(localStorage.getItem('user'));
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [isAddAdsOpen, setIsAddAdsOpen] = useState(false);
@@ -61,7 +54,6 @@ export const Ads = () => {
         const fetchads = async () => {
             try {
                 const response = await axios.get(`${server}/vendor/ads/${user.user.id}`);
-
                 setAds(response.data.flat());
             } catch (error) {
                 console.error('Failed to fetch ads:', error);
@@ -69,13 +61,38 @@ export const Ads = () => {
         };
 
         fetchads();
-    }, []);
+
+        // Check for session_id in the URL
+        const queryParams = new URLSearchParams(location.search);
+        const sessionId = queryParams.get('{CHECKOUT_SESSION_ID}');
+
+        if (sessionId) {
+            // Verify the payment session
+            verifyPaymentSession(sessionId);
+        }
+    }, [location]);
+
+    const verifyPaymentSession = async (sessionId) => {
+        try {
+            const response = await axios.post(`${server}/stripe/verify-session`, { session_id: sessionId });
+            if (response.data.success) {
+                toast.success('Ad payment successful!');
+                // Refresh the ads list
+                const updatedAdsResponse = await axios.get(`${server}/vendor/ads/${user.user.id}`);
+                setAds(updatedAdsResponse.data.flat());
+            } else {
+                toast.error('Ad payment verification failed.');
+            }
+        } catch (error) {
+            console.error('Error verifying payment session:', error);
+            toast.error('Error verifying payment. Please contact support.');
+        }
+    };
 
     const handleDelete = async (adId) => {
         try {
             const response = await axios.delete(`${server}/vendor/ads/${adId}`);
             if (response.status === 200) {
-                // Remove the deleted ad from the ads state
                 setAds(ads.filter(ad => ad.id !== adId));
             }
         } catch (error) {
@@ -85,11 +102,11 @@ export const Ads = () => {
 
     const handleStatusChange = async (adId, newStatus) => {
         try {
-            const response = await axios.put(`${server}/vendor/ads/${adId}`, {
+            const response = await axios.put(`${server}/ads/${adId}/status`, {
                 status: newStatus === 'Active' ? 'active' : 'expired'
             });
-            if (response.status === 200) {
-                // Update the status of the ad in the ads state
+            if (response.status === 201) {
+                toast.success('Ad status updated successfully');
                 setAds(ads.map(ad => ad.id === adId ? {...ad, status: newStatus} : ad));
             }
         } catch (error) {
@@ -105,7 +122,6 @@ export const Ads = () => {
                 duration: duration
             });
             if (response.status === 200) {
-                // Redirect to Stripe checkout
                 window.location.href = response.data.url;
             }
         } catch (error) {
