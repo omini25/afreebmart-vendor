@@ -108,7 +108,7 @@ export const Dashboard = () => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(`${server}/vendor/products/${user.user.id}`);
-                setUserCount(response.data.flat().length);
+                setUserCount(response.data.products.length);
             } catch (error) {
                 console.error('Failed to fetch users:', error);
             }
@@ -116,6 +116,8 @@ export const Dashboard = () => {
 
         fetchUsers();
     }, []);
+
+    console.log(userCount)
 
 
     useEffect(() => {

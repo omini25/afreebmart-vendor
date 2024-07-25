@@ -95,6 +95,10 @@ export const Orders = () => {
         fetchOrders();
     }, []);
 
+    console.log(orders)
+    
+    
+
     const filterOrders = (orders, query) => {
         if (!query) {
             return orders;
@@ -476,7 +480,8 @@ export const Orders = () => {
                                                             </td>
 
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                                                <div className="text-gray-900">{order.user_name}</div>
+                                                                <div className="text-gray-900">{order.user && order.user.name}</div>
+
                                                                 <div
                                                                     className="mt-1 text-gray-500">{order.user_id}
                                                                 </div>
