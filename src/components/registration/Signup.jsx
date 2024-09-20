@@ -10,7 +10,12 @@ export const Signup = () => {
     const [store_description, setStore_Description] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [location, setLocation] = useState('');
+    const [streetNumber, setStreetNumber] = useState('');
+    const [streetName, setStreetName] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [country, setCountry] = useState('');
+    const [postalCode, setPostalCode] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -27,7 +32,7 @@ export const Signup = () => {
             store_description: store_description,
             email: email,
             phone: phone,
-            location: location,
+            location: `${streetNumber}, ${streetName}, ${city}, ${state}, ${country}, ${postalCode}`,
             password: password
         };
 
@@ -62,7 +67,7 @@ export const Signup = () => {
 
                 <p className="text-center text-sm text-gray-500">
                     Already have an account?{' '}
-                    <a href="/" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                    <a href="/" className="font-semibold leading-6 text-primary hover:text-secondary">
                         Login
                     </a>
                 </p>
@@ -84,7 +89,7 @@ export const Signup = () => {
                                         value={name}
                                         onChange={e => setName(e.target.value)}
                                         required
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
@@ -102,7 +107,7 @@ export const Signup = () => {
                                         value={store_name}
                                         onChange={e => setStore_Name(e.target.value)}
                                         required
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
@@ -119,7 +124,7 @@ export const Signup = () => {
                                         value={store_description}
                                         onChange={e => setStore_Description(e.target.value)}
                                         required
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
@@ -137,7 +142,7 @@ export const Signup = () => {
                                         required
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
@@ -155,29 +160,126 @@ export const Signup = () => {
                                         required
                                         value={phone}
                                         onChange={e => setPhone(e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                                <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
                                     Your Address
                                 </label>
-                                <div className="mt-2">
-                                    <input
-                                        id="location"
-                                        name="location"
-                                        type="text"
-                                        autoComplete="address"
-                                        required
-                                        value={location}
-                                        onChange={e => setLocation(e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    />
+                                <div className="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                                    <div>
+                                        <label htmlFor="streetNumber"
+                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                            Street Number
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="streetNumber"
+                                                name="streetNumber"
+                                                type="text"
+                                                autoComplete="street-address"
+                                                required
+                                                value={streetNumber}
+                                                onChange={e => setStreetNumber(e.target.value)}
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="streetName"
+                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                            Street Name
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="streetName"
+                                                name="streetName"
+                                                type="text"
+                                                autoComplete="street-address"
+                                                required
+                                                value={streetName}
+                                                onChange={e => setStreetName(e.target.value)}
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="city"
+                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                            City
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="city"
+                                                name="city"
+                                                type="text"
+                                                autoComplete="address-level2"
+                                                required
+                                                value={city}
+                                                onChange={e => setCity(e.target.value)}
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="state"
+                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                            State/Province
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="state"
+                                                name="state"
+                                                type="text"
+                                                autoComplete="address-level1"
+                                                required
+                                                value={state}
+                                                onChange={e => setState(e.target.value)}
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="country"
+                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                            Country
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="country"
+                                                name="country"
+                                                type="text"
+                                                autoComplete="country-name"
+                                                required
+                                                value={country}
+                                                onChange={e => setCountry(e.target.value)}
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="postalCode"
+                                               className="block text-sm font-medium leading-6 text-gray-900">
+                                            Postal Code
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="postalCode"
+                                                name="postalCode"
+                                                type="text"
+                                                autoComplete="postal-code"
+                                                required
+                                                value={postalCode}
+                                                onChange={e => setPostalCode(e.target.value)}
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
 
 
                             <div>
@@ -193,7 +295,7 @@ export const Signup = () => {
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
@@ -203,7 +305,7 @@ export const Signup = () => {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                                 >
                                     Sign up
                                 </button>

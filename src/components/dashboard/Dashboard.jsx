@@ -256,7 +256,7 @@ export const Dashboard = () => {
                                                     >
                                                         <img
                                                             className="h-8 w-8 rounded-full bg-gray-800"
-                                                            src={`${assetServer}/images/users/${user.user.image}`}
+                                                            src={`${assetServer}/images/users/${user?.user?.image || 'default_image.png'}`}
                                                             alt=""
                                                         />
                                                         <span className="sr-only">Your profile</span>

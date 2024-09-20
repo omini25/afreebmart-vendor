@@ -59,9 +59,9 @@ export const Delivery = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${server}/admin/deliveries`);
+                const response = await axios.get(`${server}/vendor/deliveries/${user.user.id}`);
                 // Flatten the array structure
-                const flattenedOrders = response.data.orders;
+                const flattenedOrders = response.data.deliveries;
                 setOrders(flattenedOrders);
             } catch (error) {
                 console.error('Failed to fetch orders:', error);
@@ -70,6 +70,8 @@ export const Delivery = () => {
 
         fetchOrders();
     }, []);
+
+    console.log(orders);
 
 
     return (
@@ -386,7 +388,7 @@ export const Delivery = () => {
                                                     </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                                    {orders.map((order) => (
+                                                    {orders && orders.map((order) => (
                                                         <tr key={order.id}>
                                                             <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                                 <div className="flex items-center">
@@ -405,9 +407,9 @@ export const Delivery = () => {
                                                             </td>
                                                             <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                                                 <div
-                                                                    className="text-gray-900">$ {order.total_price}</div>
+                                                                    className="text-gray-900"> {order.delivery_location}</div>
                                                                 <div
-                                                                    className="mt-1 text-gray-500">{order.quantity}
+                                                                    className="mt-1 text-gray-500">{order.deliverer}
                                                                 </div>
                                                             </td>
 
@@ -429,7 +431,7 @@ export const Delivery = () => {
                                                             <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                                 <Link to={`/order-details/${order.id}`}
                                                                       className="text-indigo-600 hover:text-indigo-900">
-                                                                    View<span className="sr-only">, {order.id}</span>
+                                                                    View Order<span className="sr-only">, {order.id}</span>
                                                                 </Link>
                                                             </td>
                                                         </tr>

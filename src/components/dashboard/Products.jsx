@@ -410,12 +410,12 @@ export const Products = () => {
                                                   >
                                                     Add a single product
                                                   </button>
-                                                  <input
-                                                      type="file"
-                                                      accept=".csv, .xlsx"
-                                                      className="relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
-                                                      onChange={handleFileUpload}
-                                                  />
+                                                  {/*<input*/}
+                                                  {/*    type="file"*/}
+                                                  {/*    accept=".csv, .xlsx"*/}
+                                                  {/*    className="relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"*/}
+                                                  {/*    onChange={handleFileUpload}*/}
+                                                  {/*/>*/}
                                                 </span>
                                             </div>
                                         </div>

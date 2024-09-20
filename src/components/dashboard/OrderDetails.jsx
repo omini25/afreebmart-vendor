@@ -338,7 +338,7 @@ export const OrderDetails = () => {
                                                     </time>
                                                 </p>
                                             </div>
-                                            {order && order.deliverer && order.deliverer !== 'afreebmart' && (
+                                            {order && order.status === 'Awaiting Vendor Processing' && (
                                                 <div className="mt-3 sm:ml-4 sm:mt-0">
                                                     <p className="pb-1">
                                                         Change Deliver Status
@@ -365,24 +365,34 @@ export const OrderDetails = () => {
                                                                 <Menu.Items
                                                                     className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                                                     <div className="px-1 py-1 ">
-                                                                        {['Pending', 'Shipped', 'Completed'].filter(status => status !== selectedStatus).map((status) => (
+                                                                        {['Order ready for shipping'].filter(status => status !== selectedStatus).map((status) => (
                                                                             <Menu.Item key={status}>
-                                                                                {({active}) => (
+                                                                                {({ active }) => (
                                                                                     <button
-                                                                                        onClick={() => {
+                                                                                        onClick={async () => {
                                                                                             setSelectedStatus(status);
-                                                                                            fetch(`${server}/vendor/order-status/` + order.id, {
-                                                                                                method: 'PUT',
-                                                                                                headers: {
-                                                                                                    'Content-Type': 'application/json',
-                                                                                                },
-                                                                                                body: JSON.stringify({status}),
-                                                                                            })
-                                                                                                .then(response => response.json())
-                                                                                                .then(data => console.log(data))
-                                                                                                .catch((error) => {
-                                                                                                    console.error('Error:', error);
+                                                                                            try {
+                                                                                                const response = await fetch(`${server}/vendor/order-status/${order.id}`, {
+                                                                                                    method: 'PUT',
+                                                                                                    headers: {
+                                                                                                        'Content-Type': 'application/json',
+                                                                                                    },
+                                                                                                    body: JSON.stringify({ status: 'pending' }), // Send 'pending' to the API
                                                                                                 });
+
+                                                                                                if (response.ok) {
+                                                                                                    const data = await response.json();
+                                                                                                    console.log(data);
+                                                                                                    toast.success('Order status updated successfully!');
+                                                                                                    window.location.reload(); // Refresh the page
+                                                                                                } else {
+                                                                                                    console.error('Error updating order status:', response.status);
+                                                                                                    // Handle error, maybe display an error message to the user
+                                                                                                }
+                                                                                            } catch (error) {
+                                                                                                console.error('Error updating order status:', error);
+                                                                                                // Handle error, maybe display an error message to the user
+                                                                                            }
                                                                                         }}
                                                                                         className={`${
                                                                                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
@@ -411,6 +421,7 @@ export const OrderDetails = () => {
                                                     <div
                                                         className="border-b border-t border-gray-200 bg-white shadow-sm sm:rounded-lg sm:border"
                                                     >
+
                                                         <div
                                                             className="px-4 py-6 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:p-8">
                                                             <div className="sm:flex lg:col-span-7">
@@ -430,6 +441,7 @@ export const OrderDetails = () => {
                                                                     <p className="mt-2 text-sm font-medium text-gray-900">Price
                                                                         - ${order.price}</p>
                                                                 </div>
+
                                                             </div>
 
                                                             <div className="mt-6 lg:col-span-5 lg:mt-0">
